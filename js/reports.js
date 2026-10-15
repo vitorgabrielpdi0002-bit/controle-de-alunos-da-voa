@@ -25,7 +25,41 @@ export function renderCategoryBreakdownTable() {
   const payments = store.getPayments(currentMonth);
   const trainings = store.getTrainings().filter(t => t.status === 'concluido');
 
-  container.innerHTML = CATEGORIES.map(cat => {
+  // Rows for the 2 Turmas first
+  const pequenosAthletes = athletes.filter(a => a.groupId === 'pequenos' && a.status === 'ativo');
+  const grandesAthletes = athletes.filter(a => a.groupId === 'grandes' && a.status === 'ativo');
+  const exceptions = athletes.filter(a => a.playsUp === true && a.status === 'ativo');
+
+  let html = `
+    <!-- Linhas das 2 Turmas Principais -->
+    <tr style="background: rgba(6, 182, 212, 0.08); font-weight: 800;">
+      <td>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="width: 12px; height: 12px; border-radius: 50%; background: #06b6d4;"></span>
+          <span style="color: #06b6d4;">👶 TURMA PEQUENOS (6 a 14 anos) • Ter/Qui/Sáb</span>
+        </div>
+      </td>
+      <td><strong>${pequenosAthletes.length}</strong> atletas</td>
+      <td><span style="color: #06b6d4;">Oficial 3x/semana</span></td>
+      <td colspan="2" style="font-size: 0.8rem; color: var(--text-muted);">${exceptions.length} atletas jogam também no Grande</td>
+    </tr>
+
+    <tr style="background: rgba(245, 158, 11, 0.08); font-weight: 800;">
+      <td>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b;"></span>
+          <span style="color: #f59e0b;">🏆 TURMA GRANDES (14+ anos) • Seg/Qui/Sáb</span>
+        </div>
+      </td>
+      <td><strong>${grandesAthletes.length}</strong> atletas</td>
+      <td><span style="color: #f59e0b;">Oficial 3x/semana</span></td>
+      <td colspan="2" style="font-size: 0.8rem; color: #fbbf24;">Recebe convocação das exceções</td>
+    </tr>
+
+    <tr style="border-bottom: 2px solid var(--border-subtle);"><td colspan="5" style="padding: 4px; background: transparent;"></td></tr>
+  `;
+
+  html += CATEGORIES.map(cat => {
     const catAthletes = athletes.filter(a => a.categoryId === cat.id && a.status === 'ativo');
     
     // Revenue for this cat in current month
@@ -40,12 +74,12 @@ export function renderCategoryBreakdownTable() {
     });
 
     // Attendance rate
-    const catTrainings = trainings.filter(t => t.categoryId === cat.id);
+    const catTrainings = trainings.filter(t => t.categoryId === cat.id || t.categoryId === 'all');
     let totalPresent = 0;
     let totalPossible = 0;
     catTrainings.forEach(t => {
       totalPossible += catAthletes.length;
-      totalPresent += t.attendance.filter(att => att.status === 'presente').length;
+      totalPresent += t.attendance.filter(att => att.status === 'presente' && catAthletes.some(ca => ca.id === att.athleteId)).length;
     });
 
     const attRate = totalPossible > 0 ? Math.round((totalPresent / totalPossible) * 100) : 100;
@@ -61,7 +95,7 @@ export function renderCategoryBreakdownTable() {
         <td><strong>${catAthletes.length}</strong> atletas</td>
         <td>
           <span style="color: ${attRate >= 75 ? '#10b981' : '#f59e0b'}; font-weight: 700;">
-            ${catTrainings.length > 0 ? `${attRate}% (${catTrainings.length} treinos)` : 'Sem treinos'}
+            ${catTrainings.length > 0 ? `${attRate}% frequência` : 'Sem registros'}
           </span>
         </td>
         <td style="color: #10b981; font-weight: 700;">${formatCurrency(collected)}</td>
@@ -69,6 +103,8 @@ export function renderCategoryBreakdownTable() {
       </tr>
     `;
   }).join('');
+
+  container.innerHTML = html;
 }
 
 function setupExportAndBackupListeners() {
@@ -77,10 +113,12 @@ function setupExportAndBackupListeners() {
   if (btnExpAthletes) {
     btnExpAthletes.addEventListener('click', () => {
       const athletes = store.getAthletes();
-      let csv = 'ID,Nome,Apelido,Nascimento,Genero,Categoria,Responsavel,WhatsApp,Mensalidade,Status\n';
+      let csv = 'ID,Nome,Apelido,Nascimento,Genero,Turma,ExcecaoJogaGrande,Categoria,Responsavel,WhatsApp,Mensalidade,Status\n';
       athletes.forEach(a => {
         const cat = getCategoryById(a.categoryId);
-        csv += `"${a.id}","${a.name}","${a.nickname || ''}","${a.birthDate}","${a.gender}","${cat.name}","${a.guardianName || ''}","${a.guardianPhone || ''}","${a.monthlyFee}","${a.status}"\n`;
+        const turma = a.groupId === 'grandes' ? 'Grandes (14+)' : 'Pequenos (6-14)';
+        const jogaGrande = a.playsUp ? 'SIM' : 'NAO';
+        csv += `"${a.id}","${a.name}","${a.nickname || ''}","${a.birthDate}","${a.gender}","${turma}","${jogaGrande}","${cat.name}","${a.guardianName || ''}","${a.guardianPhone || ''}","${a.monthlyFee}","${a.status}"\n`;
       });
       downloadFile(csv, 'atletas_voa_sports.csv', 'text/csv');
       showToast('Planilha de atletas exportada!', 'success');

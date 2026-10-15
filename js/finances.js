@@ -8,16 +8,15 @@ import { ICONS, formatCurrency, formatDate, formatMonthName, renderCategoryBadge
 
 let selectedMonth = '2026-10'; // Default current reference month
 let selectedStatusFilter = 'all';
+let selectedGroupFilter = 'all';
 let selectedCategoryFilter = 'all';
 let searchQuery = '';
 let currentPayingPaymentId = null;
 
 export function initFinancesModule() {
   const today = new Date().toISOString().slice(0, 7);
-  // If current local month is available, we can use it or keep 2026-10
   selectedMonth = today || '2026-10';
 
-  // Ensure all active athletes have a payment record for the selected month
   store.syncPaymentsForMonth(selectedMonth);
 
   renderMonthSelector();
@@ -43,7 +42,7 @@ export function renderFinancialKPIs() {
   let countTotalPayable = 0;
 
   payments.forEach(p => {
-    if (p.status === 'isento') return; // Skip scholarship holders from money calculations
+    if (p.status === 'isento') return;
 
     countTotalPayable++;
     if (p.status === 'pago') {
@@ -74,6 +73,14 @@ export function renderPaymentsTable() {
   if (!container) return;
 
   let list = store.getPayments(selectedMonth);
+
+  // Filter by group (Pequenos / Grandes)
+  if (selectedGroupFilter !== 'all') {
+    list = list.filter(p => {
+      const ath = store.getAthleteById(p.athleteId);
+      return ath && ath.groupId === selectedGroupFilter;
+    });
+  }
 
   // Filter by category
   if (selectedCategoryFilter !== 'all') {
@@ -116,6 +123,8 @@ export function renderPaymentsTable() {
 
     const cat = getCategoryById(athlete.categoryId);
     const initials = getInitials(athlete.name);
+    const grpName = athlete.groupId === 'grandes' ? 'Turma Grandes' : 'Turma Pequenos';
+    const grpColor = athlete.groupId === 'grandes' ? '#f59e0b' : '#06b6d4';
 
     // WhatsApp Reminder text
     const config = store.config;
@@ -160,7 +169,10 @@ export function renderPaymentsTable() {
             </div>
             <div>
               <div style="font-weight: 700;">${athlete.name}</div>
-              <div style="font-size: 0.76rem; color: var(--text-dim);">${cat.name}</div>
+              <div style="font-size: 0.75rem; color: ${grpColor}; font-weight: 700;">
+                ${grpName} • ${cat.code}
+                ${athlete.playsUp ? '<span style="color: #ef4444;" title="Joga no Grande (Exceção)"> ⚡ Exceção</span>' : ''}
+              </div>
             </div>
           </div>
         </td>
@@ -237,6 +249,14 @@ function setupEventListeners() {
   if (filterStatus) {
     filterStatus.addEventListener('change', (e) => {
       selectedStatusFilter = e.target.value;
+      renderPaymentsTable();
+    });
+  }
+
+  const filterGroup = document.getElementById('filterPaymentGroup');
+  if (filterGroup) {
+    filterGroup.addEventListener('change', (e) => {
+      selectedGroupFilter = e.target.value;
       renderPaymentsTable();
     });
   }

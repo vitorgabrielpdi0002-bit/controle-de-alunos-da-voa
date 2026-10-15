@@ -25,7 +25,8 @@ export const ICONS = {
   clock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
   mapPin: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`,
   user: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>`,
-  alertCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+  alertCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  bolt: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
 };
 
 export function formatCurrency(value) {
@@ -58,6 +59,32 @@ export function renderCategoryBadge(categoryId) {
       ${cat.name}
     </span>
   `;
+}
+
+export function renderGroupBadge(groupId, playsUp = false) {
+  const isGrandes = groupId === 'grandes';
+  const name = isGrandes ? 'Turma Grandes (14+)' : 'Turma Pequenos (6-14)';
+  const color = isGrandes ? '#f59e0b' : '#06b6d4';
+  const bg = isGrandes ? 'rgba(245, 158, 11, 0.15)' : 'rgba(6, 182, 212, 0.15)';
+  const days = isGrandes ? 'Seg / Qui / Sáb' : 'Ter / Qui / Sáb';
+
+  let html = `
+    <span class="group-badge" style="background: ${bg}; color: ${color}; border: 1px solid ${color}40; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: var(--radius-full); font-size: 0.73rem; font-weight: 800;">
+      <span style="width: 7px; height: 7px; border-radius: 50%; background: ${color};"></span>
+      ${name}
+      <span style="font-weight: 500; font-size: 0.68rem; opacity: 0.85;">(${days})</span>
+    </span>
+  `;
+
+  if (playsUp) {
+    html += `
+      <span class="plays-up-badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 800;" title="Exceção: Atleta do Pequeno que joga na Turma Grandes">
+        ⚡ Joga no Grande
+      </span>
+    `;
+  }
+
+  return html;
 }
 
 export function getInitials(name) {

@@ -3,15 +3,56 @@
  * Módulo de Dados e Armazenamento (LocalStorage)
  */
 
+// 2 Turmas Principais de Treino da VOA
+export const GROUPS = [
+  {
+    id: 'pequenos',
+    name: 'Turma Pequenos',
+    code: 'Pequenos (6 a 14 anos)',
+    shortCode: 'Pequenos',
+    ageRange: '6 a 14 anos',
+    minAge: 6,
+    maxAge: 14,
+    days: ['Terça-feira', 'Quinta-feira', 'Sábado'],
+    daysShort: 'Ter / Qui / Sáb',
+    color: '#06b6d4',
+    bg: 'rgba(6, 182, 212, 0.15)'
+  },
+  {
+    id: 'grandes',
+    name: 'Turma Grandes',
+    code: 'Grandes (14+ anos)',
+    shortCode: 'Grandes',
+    ageRange: '14 anos acima',
+    minAge: 14,
+    maxAge: 99,
+    days: ['Segunda-feira', 'Quinta-feira', 'Sábado'],
+    daysShort: 'Seg / Qui / Sáb',
+    color: '#f59e0b',
+    bg: 'rgba(245, 158, 11, 0.15)'
+  }
+];
+
+export function getGroupById(id) {
+  return GROUPS.find(g => g.id === id) || GROUPS[0];
+}
+
+export function suggestGroup(birthDateString) {
+  const age = calculateAge(birthDateString);
+  if (age === null) return 'pequenos';
+  return age >= 14 ? 'grandes' : 'pequenos';
+}
+
+// Categorias Oficiais por Faixa Etária e Gênero (Torneios / Federação)
 export const CATEGORIES = [
-  { id: 'sub11_m', name: 'Sub-11 Masculino', code: 'Sub-11 M', minAge: 7, maxAge: 11, gender: 'M', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)' },
-  { id: 'sub11_f', name: 'Sub-11 Feminino', code: 'Sub-11 F', minAge: 7, maxAge: 11, gender: 'F', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)' },
-  { id: 'sub13_m', name: 'Sub-13 Masculino', code: 'Sub-13 M', minAge: 12, maxAge: 13, gender: 'M', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
-  { id: 'sub13_f', name: 'Sub-13 Feminino', code: 'Sub-13 F', minAge: 12, maxAge: 13, gender: 'F', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
-  { id: 'sub16_m', name: 'Sub-16 Masculino', code: 'Sub-16 M', minAge: 14, maxAge: 16, gender: 'M', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
-  { id: 'sub16_f', name: 'Sub-16 Feminino', code: 'Sub-16 F', minAge: 14, maxAge: 16, gender: 'F', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
-  { id: 'sub18_m', name: 'Sub-18 Masculino', code: 'Sub-18 M', minAge: 17, maxAge: 18, gender: 'M', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
-  { id: 'sub18_f', name: 'Sub-18 Feminino', code: 'Sub-18 F', minAge: 17, maxAge: 18, gender: 'F', color: '#d946ef', bg: 'rgba(217, 70, 239, 0.15)' },
+  { id: 'sub11_m', name: 'Sub-11 Masculino', code: 'Sub-11 M', minAge: 6, maxAge: 11, gender: 'M', defaultGroup: 'pequenos', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)' },
+  { id: 'sub11_f', name: 'Sub-11 Feminino', code: 'Sub-11 F', minAge: 6, maxAge: 11, gender: 'F', defaultGroup: 'pequenos', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)' },
+  { id: 'sub13_m', name: 'Sub-13 Masculino', code: 'Sub-13 M', minAge: 12, maxAge: 13, gender: 'M', defaultGroup: 'pequenos', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
+  { id: 'sub13_f', name: 'Sub-13 Feminino', code: 'Sub-13 F', minAge: 12, maxAge: 13, gender: 'F', defaultGroup: 'pequenos', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
+  { id: 'sub16_m', name: 'Sub-16 Masculino', code: 'Sub-16 M', minAge: 14, maxAge: 16, gender: 'M', defaultGroup: 'grandes', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
+  { id: 'sub16_f', name: 'Sub-16 Feminino', code: 'Sub-16 F', minAge: 14, maxAge: 16, gender: 'F', defaultGroup: 'grandes', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
+  { id: 'sub18_m', name: 'Sub-18 Masculino', code: 'Sub-18 M', minAge: 17, maxAge: 18, gender: 'M', defaultGroup: 'grandes', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
+  { id: 'sub18_f', name: 'Sub-18 Feminino', code: 'Sub-18 F', minAge: 17, maxAge: 18, gender: 'F', defaultGroup: 'grandes', color: '#d946ef', bg: 'rgba(217, 70, 239, 0.15)' },
 ];
 
 export function getCategoryById(id) {
@@ -46,20 +87,22 @@ export function suggestCategory(birthDateString, gender = 'M') {
   return gender === 'F' ? 'sub18_f' : 'sub18_m';
 }
 
-const STORAGE_KEY_ATHLETES = 'voa_athletes_v1';
-const STORAGE_KEY_TRAININGS = 'voa_trainings_v1';
-const STORAGE_KEY_PAYMENTS = 'voa_payments_v1';
-const STORAGE_KEY_CONFIG = 'voa_config_v1';
+const STORAGE_KEY_ATHLETES = 'voa_athletes_v2';
+const STORAGE_KEY_TRAININGS = 'voa_trainings_v2';
+const STORAGE_KEY_PAYMENTS = 'voa_payments_v2';
+const STORAGE_KEY_CONFIG = 'voa_config_v2';
 
-// Initial Sample Data for rich out-of-the-box experience
+// Dados Iniciais Realistas com 2 Turmas e Atletas de Exceção que jogam no Grande
 export const INITIAL_ATHLETES = [
-  // Sub-11 Masculino
+  // TURMA PEQUENOS (6 a 14 anos)
   {
     id: 'ath-1',
     name: 'Lucas Gabriel Silveira',
     nickname: 'Luquinhas',
     birthDate: '2015-04-12',
     gender: 'M',
+    groupId: 'pequenos',
+    playsUp: false,
     categoryId: 'sub11_m',
     guardianName: 'Marcos Silveira (Pai)',
     guardianPhone: '11987654321',
@@ -77,6 +120,8 @@ export const INITIAL_ATHLETES = [
     nickname: 'Enzo',
     birthDate: '2016-08-22',
     gender: 'M',
+    groupId: 'pequenos',
+    playsUp: false,
     categoryId: 'sub11_m',
     guardianName: 'Fernanda Alves (Mãe)',
     guardianPhone: '11981112233',
@@ -88,13 +133,14 @@ export const INITIAL_ATHLETES = [
     medicalNotes: 'Usa bombinha para asma preventiva',
     createdAt: '2026-03-01'
   },
-  // Sub-11 Feminino
   {
     id: 'ath-3',
     name: 'Sofia Helena Martins',
     nickname: 'Sofi',
     birthDate: '2015-11-05',
     gender: 'F',
+    groupId: 'pequenos',
+    playsUp: false,
     categoryId: 'sub11_f',
     guardianName: 'Camila Martins (Mãe)',
     guardianPhone: '11972345678',
@@ -112,6 +158,8 @@ export const INITIAL_ATHLETES = [
     nickname: 'Larinha',
     birthDate: '2016-01-30',
     gender: 'F',
+    groupId: 'pequenos',
+    playsUp: false,
     categoryId: 'sub11_f',
     guardianName: 'Renato Santos (Pai)',
     guardianPhone: '11993456789',
@@ -123,13 +171,15 @@ export const INITIAL_ATHLETES = [
     medicalNotes: '',
     createdAt: '2026-03-12'
   },
-  // Sub-13 Masculino
+  // SUB-13 COM ATLETAS DE EXCEÇÃO QUE JOGAM NO GRANDE!
   {
     id: 'ath-5',
     name: 'Matheus Felipe Costa',
     nickname: 'Theus',
-    birthDate: '2013-05-18',
+    birthDate: '2013-05-18', // 13 anos
     gender: 'M',
+    groupId: 'pequenos',
+    playsUp: true, // EXCEÇÃO: Joga no Grande!
     categoryId: 'sub13_m',
     guardianName: 'Juliana Costa (Mãe)',
     guardianPhone: '11974561234',
@@ -137,16 +187,18 @@ export const INITIAL_ATHLETES = [
     monthlyFee: 140,
     dueDay: 10,
     status: 'ativo',
-    position: 'Zagueiro Central',
-    medicalNotes: '',
+    position: 'Zagueiro Central / Armador',
+    medicalNotes: 'Destaque técnico - joga também na Turma dos Grandes',
     createdAt: '2026-01-15'
   },
   {
     id: 'ath-6',
     name: 'Davi Lucca Ribeiro',
     nickname: 'Davi',
-    birthDate: '2014-02-14',
+    birthDate: '2014-02-14', // 12 anos
     gender: 'M',
+    groupId: 'pequenos',
+    playsUp: false,
     categoryId: 'sub13_m',
     guardianName: 'Paulo Ribeiro (Pai)',
     guardianPhone: '11985672345',
@@ -158,13 +210,14 @@ export const INITIAL_ATHLETES = [
     medicalNotes: '',
     createdAt: '2026-02-01'
   },
-  // Sub-13 Feminino
   {
     id: 'ath-7',
     name: 'Isabella Moreira Lima',
     nickname: 'Bella',
-    birthDate: '2013-09-09',
+    birthDate: '2013-09-09', // 13 anos
     gender: 'F',
+    groupId: 'pequenos',
+    playsUp: true, // EXCEÇÃO: Joga no Grande!
     categoryId: 'sub13_f',
     guardianName: 'Patricia Moreira (Mãe)',
     guardianPhone: '11988776655',
@@ -173,15 +226,17 @@ export const INITIAL_ATHLETES = [
     dueDay: 10,
     status: 'ativo',
     position: 'Meia Ofensiva',
-    medicalNotes: '',
+    medicalNotes: 'Alto rendimento - convocada para treinos dos Grandes',
     createdAt: '2026-01-20'
   },
   {
     id: 'ath-8',
     name: 'Manuela Nogueira Cruz',
     nickname: 'Manu',
-    birthDate: '2014-07-25',
+    birthDate: '2014-07-25', // 12 anos
     gender: 'F',
+    groupId: 'pequenos',
+    playsUp: false,
     categoryId: 'sub13_f',
     guardianName: 'Eduardo Cruz (Pai)',
     guardianPhone: '11991234567',
@@ -190,16 +245,18 @@ export const INITIAL_ATHLETES = [
     dueDay: 10,
     status: 'ativo',
     position: 'Pivô / Centroavante',
-    medicalNotes: 'Atleta Bolsista de Alto Rendimento',
+    medicalNotes: 'Atleta Bolsista de Formação',
     createdAt: '2026-02-05'
   },
-  // Sub-16 Masculino
+  // TURMA GRANDES (14 anos acima)
   {
     id: 'ath-9',
     name: 'Gabriel Henrique Duarte',
     nickname: 'Biel',
-    birthDate: '2010-03-14',
+    birthDate: '2010-03-14', // 16 anos
     gender: 'M',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub16_m',
     guardianName: 'Marcelo Duarte (Pai)',
     guardianPhone: '11976549876',
@@ -215,8 +272,10 @@ export const INITIAL_ATHLETES = [
     id: 'ath-10',
     name: 'Pedro Arthur Mendes',
     nickname: 'Pedrão',
-    birthDate: '2011-06-30',
+    birthDate: '2011-06-30', // 15 anos
     gender: 'M',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub16_m',
     guardianName: 'Aline Mendes (Mãe)',
     guardianPhone: '11984321098',
@@ -228,13 +287,14 @@ export const INITIAL_ATHLETES = [
     medicalNotes: '',
     createdAt: '2025-11-02'
   },
-  // Sub-16 Feminino
   {
     id: 'ath-11',
     name: 'Julia Cristina Barbosa',
     nickname: 'Juju',
-    birthDate: '2010-12-19',
+    birthDate: '2010-12-19', // 15 anos
     gender: 'F',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub16_f',
     guardianName: 'Cristiane Barbosa (Mãe)',
     guardianPhone: '11998761234',
@@ -250,8 +310,10 @@ export const INITIAL_ATHLETES = [
     id: 'ath-12',
     name: 'Beatriz Vasconcelos',
     nickname: 'Bia',
-    birthDate: '2011-04-08',
+    birthDate: '2011-04-08', // 15 anos
     gender: 'F',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub16_f',
     guardianName: 'Jorge Vasconcelos (Pai)',
     guardianPhone: '11973216549',
@@ -263,13 +325,14 @@ export const INITIAL_ATHLETES = [
     medicalNotes: 'Recuperada de entorse no tornozelo',
     createdAt: '2025-10-25'
   },
-  // Sub-18 Masculino
   {
     id: 'ath-13',
     name: 'Felipe Augusto Toledo',
     nickname: 'Toledo',
-    birthDate: '2008-07-11',
+    birthDate: '2008-07-11', // 18 anos
     gender: 'M',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub18_m',
     guardianName: 'Ricardo Toledo (Pai)',
     guardianPhone: '11987654320',
@@ -285,8 +348,10 @@ export const INITIAL_ATHLETES = [
     id: 'ath-14',
     name: 'Nicolas Santana Prado',
     nickname: 'Nico',
-    birthDate: '2009-01-20',
+    birthDate: '2009-01-20', // 17 anos
     gender: 'M',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub18_m',
     guardianName: 'Silvia Santana (Mãe)',
     guardianPhone: '11981239876',
@@ -298,13 +363,14 @@ export const INITIAL_ATHLETES = [
     medicalNotes: '',
     createdAt: '2025-06-15'
   },
-  // Sub-18 Feminino
   {
     id: 'ath-15',
     name: 'Camila Vitória Ferreira',
     nickname: 'Mila',
-    birthDate: '2008-10-04',
+    birthDate: '2008-10-04', // 18 anos
     gender: 'F',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub18_f',
     guardianName: 'Valéria Ferreira (Mãe)',
     guardianPhone: '11996541230',
@@ -320,8 +386,10 @@ export const INITIAL_ATHLETES = [
     id: 'ath-16',
     name: 'Giovanna Rocha Dias',
     nickname: 'Gio',
-    birthDate: '2009-05-15',
+    birthDate: '2009-05-15', // 17 anos
     gender: 'F',
+    groupId: 'grandes',
+    playsUp: false,
     categoryId: 'sub18_f',
     guardianName: 'Marcos Dias (Pai)',
     guardianPhone: '11983457890',
@@ -335,82 +403,116 @@ export const INITIAL_ATHLETES = [
   }
 ];
 
+// Treinos seguindo a grade oficial:
+// PEQUENOS: Terça, Quinta e Sábado
+// GRANDES: Segunda, Quinta e Sábado
 export const INITIAL_TRAININGS = [
+  // Quinta-feira (Hoje - 15/10/2026): Treino dos Pequenos e dos Grandes!
   {
     id: 'tr-1',
-    categoryId: 'sub13_m',
-    date: '2026-10-15',
-    startTime: '15:00',
-    endTime: '16:30',
+    groupId: 'pequenos',
+    categoryId: 'all',
+    date: '2026-10-15', // Quinta-feira
+    dayName: 'Quinta-feira',
+    startTime: '15:30',
+    endTime: '17:00',
     location: 'Quadra Principal VOA',
     coach: 'Prof. Carlos Eduardo',
-    focus: 'Fundamentos de Passe e Transição Rápida',
+    focus: 'Fundamentos de Passe, Domínio e Condução Rápida',
     attendance: [
-      { athleteId: 'ath-5', status: 'presente', note: '' },
-      { athleteId: 'ath-6', status: 'presente', note: 'Excelente intensidade' }
+      { athleteId: 'ath-1', status: 'presente', note: '' },
+      { athleteId: 'ath-2', status: 'presente', note: '' },
+      { athleteId: 'ath-3', status: 'presente', note: '' },
+      { athleteId: 'ath-4', status: 'presente', note: '' },
+      { athleteId: 'ath-5', status: 'presente', note: 'Treina no Pequeno e no Grande' },
+      { athleteId: 'ath-6', status: 'presente', note: '' },
+      { athleteId: 'ath-7', status: 'presente', note: '' },
+      { athleteId: 'ath-8', status: 'presente', note: '' }
     ],
     status: 'concluido'
   },
   {
     id: 'tr-2',
-    categoryId: 'sub16_f',
-    date: '2026-10-15',
-    startTime: '16:45',
-    endTime: '18:15',
-    location: 'Quadra 2 / Arena VOA',
-    coach: 'Profa. Juliana Rossi',
-    focus: 'Organização Defensiva e Bloqueio',
+    groupId: 'grandes',
+    categoryId: 'all',
+    date: '2026-10-15', // Quinta-feira
+    dayName: 'Quinta-feira',
+    startTime: '17:15',
+    endTime: '19:00',
+    location: 'Quadra Principal VOA',
+    coach: 'Profa. Juliana Rossi e Prof. Roberto',
+    focus: 'Tática Coletiva, Transição Ofensiva e Finalizações',
     attendance: [
+      { athleteId: 'ath-9', status: 'presente', note: '' },
+      { athleteId: 'ath-10', status: 'presente', note: '' },
       { athleteId: 'ath-11', status: 'presente', note: '' },
-      { athleteId: 'ath-12', status: 'ausente', note: 'Avisou compromisso escolar' }
+      { athleteId: 'ath-12', status: 'ausente', note: 'Avisou compromisso escolar' },
+      { athleteId: 'ath-13', status: 'presente', note: '' },
+      { athleteId: 'ath-14', status: 'presente', note: '' },
+      { athleteId: 'ath-15', status: 'presente', note: '' },
+      { athleteId: 'ath-16', status: 'presente', note: '' },
+      // Exceções presentes no treino dos Grandes:
+      { athleteId: 'ath-5', status: 'presente', note: 'Atleta do Pequeno jogando no Grande' },
+      { athleteId: 'ath-7', status: 'presente', note: 'Atleta do Pequeno jogando no Grande' }
     ],
     status: 'concluido'
   },
+  // Sábado (17/10/2026): Pequenos pela manhã + Grandes na sequência
   {
     id: 'tr-3',
-    categoryId: 'sub11_m',
-    date: '2026-10-16',
-    startTime: '09:00',
-    endTime: '10:30',
+    groupId: 'pequenos',
+    categoryId: 'all',
+    date: '2026-10-17', // Sábado
+    dayName: 'Sábado',
+    startTime: '08:30',
+    endTime: '10:00',
     location: 'Quadra Principal VOA',
     coach: 'Prof. Carlos Eduardo',
-    focus: 'Domínio de Bola e Jogos Lúdicos',
+    focus: 'Jogos Coletivos Reduzidos e Finalização',
     attendance: [],
     status: 'agendado'
   },
   {
     id: 'tr-4',
-    categoryId: 'sub11_f',
-    date: '2026-10-16',
-    startTime: '10:30',
+    groupId: 'grandes',
+    categoryId: 'all',
+    date: '2026-10-17', // Sábado
+    dayName: 'Sábado',
+    startTime: '10:15',
     endTime: '12:00',
     location: 'Quadra Principal VOA',
     coach: 'Profa. Juliana Rossi',
-    focus: 'Coordenação Motora e Finalização',
+    focus: 'Simulação de Partida Oficial e Bola Parada',
     attendance: [],
     status: 'agendado'
   },
+  // Segunda-feira (19/10/2026): Treino Exclusivo dos GRANDES
   {
     id: 'tr-5',
-    categoryId: 'sub18_m',
-    date: '2026-10-16',
-    startTime: '17:00',
-    endTime: '19:00',
-    location: 'Campo de Treinamento VOA',
+    groupId: 'grandes',
+    categoryId: 'all',
+    date: '2026-10-19', // Segunda-feira
+    dayName: 'Segunda-feira',
+    startTime: '17:30',
+    endTime: '19:15',
+    location: 'Quadra Principal VOA',
     coach: 'Prof. Roberto Martins',
-    focus: 'Tática Coletiva e Bola Parada',
+    focus: 'Condicionamento Físico, Força e Organização Tática',
     attendance: [],
     status: 'agendado'
   },
+  // Terça-feira (20/10/2026): Treino Exclusivo dos PEQUENOS
   {
     id: 'tr-6',
-    categoryId: 'sub18_f',
-    date: '2026-10-17',
-    startTime: '09:30',
-    endTime: '11:00',
+    groupId: 'pequenos',
+    categoryId: 'all',
+    date: '2026-10-20', // Terça-feira
+    dayName: 'Terça-feira',
+    startTime: '16:00',
+    endTime: '17:30',
     location: 'Quadra Principal VOA',
-    coach: 'Profa. Juliana Rossi',
-    focus: 'Simulação de Jogo e Velocidade',
+    coach: 'Prof. Carlos Eduardo',
+    focus: 'Coordenação Motora, Drible e Tomada de Decisão',
     attendance: [],
     status: 'agendado'
   }
@@ -684,12 +786,13 @@ class DataStore {
     const newAthlete = {
       ...athleteData,
       id,
+      groupId: athleteData.groupId || suggestGroup(athleteData.birthDate),
+      playsUp: Boolean(athleteData.playsUp),
       createdAt: new Date().toISOString().split('T')[0]
     };
     this.athletes.unshift(newAthlete);
     this.saveAthletes();
 
-    // Generate current month fee record for this athlete
     const currentMonth = new Date().toISOString().slice(0, 7);
     this.ensurePaymentRecord(newAthlete, currentMonth);
 
@@ -699,7 +802,11 @@ class DataStore {
   updateAthlete(id, athleteData) {
     const index = this.athletes.findIndex(a => a.id === id);
     if (index !== -1) {
-      this.athletes[index] = { ...this.athletes[index], ...athleteData };
+      this.athletes[index] = { 
+        ...this.athletes[index], 
+        ...athleteData,
+        playsUp: Boolean(athleteData.playsUp)
+      };
       this.saveAthletes();
       return this.athletes[index];
     }
@@ -709,7 +816,6 @@ class DataStore {
   deleteAthlete(id) {
     this.athletes = this.athletes.filter(a => a.id !== id);
     this.saveAthletes();
-    // Also remove from trainings attendance if needed
   }
 
   // Trainings methods
@@ -721,11 +827,25 @@ class DataStore {
     return this.trainings.find(t => t.id === id);
   }
 
+  // Retorna os atletas que devem participar de um treino
+  // Para treino dos GRANDES: inclui os atletas fixos dos Grandes + atletas dos Pequenos com exceção playsUp!
+  // Para treino dos PEQUENOS: inclui os atletas da turma dos Pequenos
+  getAthletesForTraining(training) {
+    const groupId = training.groupId || (training.categoryId && training.categoryId.includes('16') || training.categoryId.includes('18') ? 'grandes' : 'pequenos');
+    
+    if (groupId === 'grandes') {
+      return this.athletes.filter(a => a.status === 'ativo' && (a.groupId === 'grandes' || a.playsUp === true));
+    } else {
+      return this.athletes.filter(a => a.status === 'ativo' && a.groupId === 'pequenos');
+    }
+  }
+
   addTraining(trainingData) {
     const id = 'tr-' + Date.now();
     const newTraining = {
       ...trainingData,
       id,
+      groupId: trainingData.groupId || 'pequenos',
       attendance: trainingData.attendance || [],
       status: trainingData.status || 'agendado'
     };
@@ -766,7 +886,6 @@ class DataStore {
     if (monthRef) {
       list = list.filter(p => p.monthRef === monthRef);
     }
-    // Update dynamically late status if not paid and passed dueDate
     const today = new Date().toISOString().split('T')[0];
     list.forEach(p => {
       if (p.status !== 'pago' && p.status !== 'isento') {
@@ -856,9 +975,10 @@ class DataStore {
   // Backup and Export
   exportAllDataJSON() {
     return JSON.stringify({
-      version: '1.0',
+      version: '2.0',
       exportedAt: new Date().toISOString(),
       config: this.config,
+      groups: GROUPS,
       athletes: this.athletes,
       trainings: this.trainings,
       payments: this.payments

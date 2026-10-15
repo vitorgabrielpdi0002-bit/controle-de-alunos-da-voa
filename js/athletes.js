@@ -1,11 +1,12 @@
 /**
  * VOA Sports - Módulo de Gestão de Atletas
- * Listagem, Filtros, Cadastro, Edição, Histórico e Cálculo de Categoria
+ * Listagem, Filtros por Turmas (Pequenos 6-14 / Grandes 14+) e Exceções, Cadastro e Ficha
  */
 
-import { store, CATEGORIES, getCategoryById, calculateAge, suggestCategory } from './data.js';
-import { ICONS, formatCurrency, formatDate, renderCategoryBadge, getInitials, getWhatsAppUrl, openModal, closeModal, showToast } from './ui.js';
+import { store, CATEGORIES, GROUPS, getCategoryById, getGroupById, calculateAge, suggestCategory, suggestGroup } from './data.js';
+import { ICONS, formatCurrency, formatDate, renderCategoryBadge, renderGroupBadge, getInitials, getWhatsAppUrl, openModal, closeModal, showToast } from './ui.js';
 
+let selectedGroupFilter = 'all'; // 'all', 'pequenos', 'grandes', 'exceptions'
 let selectedCategoryFilter = 'all';
 let searchQuery = '';
 let currentViewingAthleteId = null;
@@ -21,27 +22,56 @@ function renderCategoryFilterChips() {
   if (!container) return;
 
   const athletes = store.getAthletes();
+  const pequenosCount = athletes.filter(a => a.groupId === 'pequenos').length;
+  const grandesCount = athletes.filter(a => a.groupId === 'grandes').length;
+  const exceptionsCount = athletes.filter(a => a.playsUp === true).length;
   
   let html = `
-    <div class="chip ${selectedCategoryFilter === 'all' ? 'active' : ''}" data-cat="all">
-      Todos (${athletes.length})
+    <!-- Filtros das 2 Turmas Principais e Exceções -->
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; width: 100%; margin-bottom: 8px;">
+      <div class="chip ${selectedGroupFilter === 'all' && selectedCategoryFilter === 'all' ? 'active' : ''}" data-filter-type="group" data-val="all">
+        Todos os Atletas (${athletes.length})
+      </div>
+      <div class="chip ${selectedGroupFilter === 'pequenos' ? 'active' : ''}" data-filter-type="group" data-val="pequenos" style="border-color: rgba(6,182,212,0.4);">
+        👶 Turma Pequenos (6 a 14) • Ter/Qui/Sáb (${pequenosCount})
+      </div>
+      <div class="chip ${selectedGroupFilter === 'grandes' ? 'active' : ''}" data-filter-type="group" data-val="grandes" style="border-color: rgba(245,158,11,0.4);">
+        🏆 Turma Grandes (14+) • Seg/Qui/Sáb (${grandesCount})
+      </div>
+      <div class="chip ${selectedGroupFilter === 'exceptions' ? 'active' : ''}" data-filter-type="group" data-val="exceptions" style="border-color: rgba(239,68,68,0.4); color: #f87171;">
+        ⚡ Exceções: Jogam no Grande (${exceptionsCount})
+      </div>
+    </div>
+
+    <!-- Filtros Secundários de Categoria de Competição -->
+    <div style="display: flex; flex-wrap: wrap; gap: 6px; width: 100%; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+      <span style="font-size: 0.73rem; color: var(--text-dim); align-self: center; margin-right: 4px; font-weight: 700;">Categorias:</span>
+      ${CATEGORIES.map(cat => {
+        const count = athletes.filter(a => a.categoryId === cat.id).length;
+        return `
+          <div class="chip ${selectedCategoryFilter === cat.id ? 'active' : ''}" data-filter-type="cat" data-val="${cat.id}" style="padding: 4px 10px; font-size: 0.74rem;">
+            ${cat.code} (${count})
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
-
-  CATEGORIES.forEach(cat => {
-    const count = athletes.filter(a => a.categoryId === cat.id).length;
-    html += `
-      <div class="chip ${selectedCategoryFilter === cat.id ? 'active' : ''}" data-cat="${cat.id}">
-        ${cat.code} (${count})
-      </div>
-    `;
-  });
 
   container.innerHTML = html;
 
   container.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      selectedCategoryFilter = chip.dataset.cat;
+      const type = chip.dataset.filterType;
+      const val = chip.dataset.val;
+
+      if (type === 'group') {
+        selectedGroupFilter = val;
+        selectedCategoryFilter = 'all';
+      } else {
+        selectedCategoryFilter = selectedCategoryFilter === val ? 'all' : val;
+        selectedGroupFilter = 'all';
+      }
+
       renderCategoryFilterChips();
       renderAthletes();
     });
@@ -53,6 +83,15 @@ export function renderAthletes() {
   if (!container) return;
 
   let list = store.getAthletes();
+
+  // Filter by group or exception
+  if (selectedGroupFilter === 'pequenos') {
+    list = list.filter(a => a.groupId === 'pequenos');
+  } else if (selectedGroupFilter === 'grandes') {
+    list = list.filter(a => a.groupId === 'grandes');
+  } else if (selectedGroupFilter === 'exceptions') {
+    list = list.filter(a => a.playsUp === true);
+  }
 
   // Filter by category
   if (selectedCategoryFilter !== 'all') {
@@ -103,7 +142,11 @@ export function renderAthletes() {
           <div class="athlete-card-info">
             <h4 class="athlete-name" title="${athlete.name}">${athlete.name}</h4>
             <div class="athlete-nickname">${athlete.nickname ? `"${athlete.nickname}" • ` : ''}${age !== null ? `${age} anos` : ''}</div>
-            ${renderCategoryBadge(athlete.categoryId)}
+            
+            <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 6px;">
+              <div>${renderGroupBadge(athlete.groupId, athlete.playsUp)}</div>
+              <div>${renderCategoryBadge(athlete.categoryId)}</div>
+            </div>
           </div>
         </div>
 
@@ -111,6 +154,12 @@ export function renderAthletes() {
           <div class="detail-row">
             <span>Posição / Foco:</span>
             <span>${athlete.position || 'Não informada'}</span>
+          </div>
+          <div class="detail-row">
+            <span>Dias de Treino:</span>
+            <span style="font-size: 0.75rem; color: #38bdf8;">
+              ${athlete.groupId === 'grandes' ? 'Segunda, Quinta e Sábado' : athlete.playsUp ? 'Ter/Qui/Sáb + Treina no Grande!' : 'Terça, Quinta e Sábado'}
+            </span>
           </div>
           <div class="detail-row">
             <span>Responsável:</span>
@@ -163,28 +212,44 @@ function setupEventListeners() {
     btnNewAthlete.addEventListener('click', () => openAthleteFormModal());
   }
 
-  // Birth date auto-calculate category in the form
+  // Birth date auto-calculate category and group in the form
   const birthInput = document.getElementById('athleteFormBirthDate');
   const genderInput = document.getElementById('athleteFormGender');
+  const groupSelect = document.getElementById('athleteFormGroup');
   const categorySelect = document.getElementById('athleteFormCategory');
   const ageFeedback = document.getElementById('athleteAgeFeedback');
 
-  function updateCategorySuggestion() {
+  function updateCategoryAndGroupSuggestion() {
     if (birthInput && birthInput.value) {
       const age = calculateAge(birthInput.value);
       const gender = genderInput ? genderInput.value : 'M';
-      const suggested = suggestCategory(birthInput.value, gender);
+      const suggestedCat = suggestCategory(birthInput.value, gender);
+      const suggestedGrp = suggestGroup(birthInput.value);
+
       if (ageFeedback) {
-        ageFeedback.textContent = `Idade calculada: ${age} anos (Sugerido: ${getCategoryById(suggested).name})`;
+        const grpName = suggestedGrp === 'grandes' ? 'Turma Grandes (14+)' : 'Turma Pequenos (6 a 14)';
+        ageFeedback.textContent = `Idade: ${age} anos • Turma sugerida: ${grpName} • Categoria: ${getCategoryById(suggestCat).name}`;
       }
+
+      if (groupSelect && (!groupSelect.dataset.manualOverride || groupSelect.dataset.manualOverride === 'false')) {
+        groupSelect.value = suggestedGrp;
+      }
+
       if (categorySelect && (!categorySelect.dataset.manualOverride || categorySelect.dataset.manualOverride === 'false')) {
-        categorySelect.value = suggested;
+        categorySelect.value = suggestedCat;
       }
     }
   }
 
-  if (birthInput) birthInput.addEventListener('change', updateCategorySuggestion);
-  if (genderInput) genderInput.addEventListener('change', updateCategorySuggestion);
+  if (birthInput) birthInput.addEventListener('change', updateCategoryAndGroupSuggestion);
+  if (genderInput) genderInput.addEventListener('change', updateCategoryAndGroupSuggestion);
+  
+  if (groupSelect) {
+    groupSelect.addEventListener('change', () => {
+      groupSelect.dataset.manualOverride = 'true';
+    });
+  }
+
   if (categorySelect) {
     categorySelect.addEventListener('change', () => {
       categorySelect.dataset.manualOverride = 'true';
@@ -205,9 +270,12 @@ export function openAthleteFormModal(athleteId = null) {
   const modalTitle = document.getElementById('athleteModalTitle');
   const form = document.getElementById('athleteForm');
   const athleteIdInput = document.getElementById('athleteFormId');
+  const groupSelect = document.getElementById('athleteFormGroup');
   const categorySelect = document.getElementById('athleteFormCategory');
+  const playsUpCheckbox = document.getElementById('athleteFormPlaysUp');
   const ageFeedback = document.getElementById('athleteAgeFeedback');
 
+  if (groupSelect) groupSelect.dataset.manualOverride = 'false';
   if (categorySelect) categorySelect.dataset.manualOverride = 'false';
   if (ageFeedback) ageFeedback.textContent = '';
 
@@ -221,6 +289,8 @@ export function openAthleteFormModal(athleteId = null) {
     document.getElementById('athleteFormNickname').value = athlete.nickname || '';
     document.getElementById('athleteFormBirthDate').value = athlete.birthDate || '';
     document.getElementById('athleteFormGender').value = athlete.gender || 'M';
+    if (groupSelect) groupSelect.value = athlete.groupId || 'pequenos';
+    if (playsUpCheckbox) playsUpCheckbox.checked = Boolean(athlete.playsUp);
     document.getElementById('athleteFormCategory').value = athlete.categoryId || 'sub13_m';
     document.getElementById('athleteFormGuardian').value = athlete.guardianName || '';
     document.getElementById('athleteFormGuardianPhone').value = athlete.guardianPhone || '';
@@ -234,6 +304,8 @@ export function openAthleteFormModal(athleteId = null) {
     if (modalTitle) modalTitle.textContent = 'Novo Atleta';
     if (athleteIdInput) athleteIdInput.value = '';
     form.reset();
+    if (groupSelect) groupSelect.value = 'pequenos';
+    if (playsUpCheckbox) playsUpCheckbox.checked = false;
     document.getElementById('athleteFormFee').value = 140;
     document.getElementById('athleteFormDueDay').value = 10;
     document.getElementById('athleteFormGender').value = 'M';
@@ -245,11 +317,15 @@ export function openAthleteFormModal(athleteId = null) {
 
 function saveAthleteFromForm() {
   const athleteId = document.getElementById('athleteFormId').value;
+  const playsUpEl = document.getElementById('athleteFormPlaysUp');
+
   const data = {
     name: document.getElementById('athleteFormName').value.trim(),
     nickname: document.getElementById('athleteFormNickname').value.trim(),
     birthDate: document.getElementById('athleteFormBirthDate').value,
     gender: document.getElementById('athleteFormGender').value,
+    groupId: document.getElementById('athleteFormGroup').value,
+    playsUp: playsUpEl ? playsUpEl.checked : false,
     categoryId: document.getElementById('athleteFormCategory').value,
     guardianName: document.getElementById('athleteFormGuardian').value.trim(),
     guardianPhone: document.getElementById('athleteFormGuardianPhone').value.trim(),
@@ -285,11 +361,12 @@ export function viewAthleteDetails(athleteId) {
   currentViewingAthleteId = athleteId;
 
   const cat = getCategoryById(athlete.categoryId);
+  const grp = getGroupById(athlete.groupId);
   const age = calculateAge(athlete.birthDate);
   const initials = getInitials(athlete.name);
 
-  // Calculate attendance rate
-  const trainings = store.getTrainings().filter(t => t.categoryId === athlete.categoryId && t.status === 'concluido');
+  // Calculate attendance rate (both in their group and games/trainings where they participated)
+  const trainings = store.getTrainings().filter(t => t.status === 'concluido');
   let totalSessions = 0;
   let presentCount = 0;
   let absentCount = 0;
@@ -320,12 +397,24 @@ export function viewAthleteDetails(athleteId) {
       </div>
       <div>
         <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 4px;">${athlete.name}</h3>
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
+          ${renderGroupBadge(athlete.groupId, athlete.playsUp)}
           ${renderCategoryBadge(athlete.categoryId)}
-          <span style="font-size: 0.85rem; color: var(--text-muted);">${age !== null ? `${age} anos` : ''} • Nasc. ${formatDate(athlete.birthDate)}</span>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">
+          ${age !== null ? `${age} anos` : ''} • Nasc. ${formatDate(athlete.birthDate)} • Dias de treino: <strong style="color: #38bdf8;">${grp.daysShort}</strong>
         </div>
       </div>
     </div>
+
+    ${athlete.playsUp ? `
+      <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #fca5a5;">
+        <span>⚡</span>
+        <div>
+          <strong>Atleta de Exceção:</strong> Este atleta é da faixa dos Pequenos (${age} anos), mas foi promovido e <strong>treina/joga também na Turma dos Grandes</strong> (Seg/Qui/Sáb).
+        </div>
+      </div>
+    ` : ''}
 
     <!-- Quick Stats in Details -->
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;">
@@ -340,8 +429,8 @@ export function viewAthleteDetails(athleteId) {
         <div style="font-size: 0.72rem; color: var(--text-dim);">Venc. Todo dia ${athlete.dueDay || 10}</div>
       </div>
       <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-align: center;">
-        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Status Atleta</div>
-        <div style="font-size: 1.3rem; font-weight: 800; color: ${athlete.status === 'ativo' ? '#10b981' : '#f59e0b'}; text-transform: capitalize;">${athlete.status}</div>
+        <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Turma Principal</div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: ${grp.color};">${grp.name}</div>
         <div style="font-size: 0.72rem; color: var(--text-dim);">${athlete.position || 'Geral'}</div>
       </div>
     </div>

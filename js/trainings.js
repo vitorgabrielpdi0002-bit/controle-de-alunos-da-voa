@@ -1,12 +1,12 @@
 /**
  * VOA Sports - Módulo de Agenda de Treinos e Frequência / Presença
- * Agendamento de Treinos, Chamada Interativa, Registro de Presença e Faltas
+ * 2 Turmas: Pequenos (Ter/Qui/Sáb) e Grandes (Seg/Qui/Sáb) + Exceções que jogam no Grande
  */
 
-import { store, CATEGORIES, getCategoryById } from './data.js';
-import { ICONS, formatDate, renderCategoryBadge, getInitials, openModal, closeModal, showToast } from './ui.js';
+import { store, CATEGORIES, GROUPS, getCategoryById, getGroupById } from './data.js';
+import { ICONS, formatDate, renderCategoryBadge, renderGroupBadge, getInitials, openModal, closeModal, showToast } from './ui.js';
 
-let selectedCategoryFilter = 'all';
+let selectedGroupFilter = 'all'; // 'all', 'pequenos', 'grandes'
 let currentCheckinTrainingId = null;
 
 export function initTrainingsModule() {
@@ -20,27 +20,26 @@ function renderTrainingCategoryChips() {
   if (!container) return;
 
   const trainings = store.getTrainings();
+  const pequenosCount = trainings.filter(t => t.groupId === 'pequenos').length;
+  const grandesCount = trainings.filter(t => t.groupId === 'grandes').length;
 
   let html = `
-    <div class="chip ${selectedCategoryFilter === 'all' ? 'active' : ''}" data-cat="all">
+    <div class="chip ${selectedGroupFilter === 'all' ? 'active' : ''}" data-grp="all">
       Todos os Treinos (${trainings.length})
     </div>
+    <div class="chip ${selectedGroupFilter === 'pequenos' ? 'active' : ''}" data-grp="pequenos" style="border-color: rgba(6,182,212,0.4);">
+      👶 Turma Pequenos (Terça, Quinta e Sábado) (${pequenosCount})
+    </div>
+    <div class="chip ${selectedGroupFilter === 'grandes' ? 'active' : ''}" data-grp="grandes" style="border-color: rgba(245,158,11,0.4);">
+      🏆 Turma Grandes (Segunda, Quinta e Sábado) (${grandesCount})
+    </div>
   `;
-
-  CATEGORIES.forEach(cat => {
-    const count = trainings.filter(t => t.categoryId === cat.id).length;
-    html += `
-      <div class="chip ${selectedCategoryFilter === cat.id ? 'active' : ''}" data-cat="${cat.id}">
-        ${cat.code} (${count})
-      </div>
-    `;
-  });
 
   container.innerHTML = html;
 
   container.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', () => {
-      selectedCategoryFilter = chip.dataset.cat;
+      selectedGroupFilter = chip.dataset.grp;
       renderTrainingCategoryChips();
       renderTrainings();
     });
@@ -53,8 +52,8 @@ export function renderTrainings() {
 
   let list = store.getTrainings();
 
-  if (selectedCategoryFilter !== 'all') {
-    list = list.filter(t => t.categoryId === selectedCategoryFilter);
+  if (selectedGroupFilter !== 'all') {
+    list = list.filter(t => t.groupId === selectedGroupFilter);
   }
 
   const todayStr = new Date().toISOString().split('T')[0];
@@ -74,14 +73,17 @@ export function renderTrainings() {
   }
 
   container.innerHTML = list.map(training => {
-    const cat = getCategoryById(training.categoryId);
+    const grp = getGroupById(training.groupId);
     const isToday = training.date === todayStr;
     const isDone = training.status === 'concluido';
 
-    // Calculate attendance numbers
-    const totalAthletesInCat = store.getAthletes().filter(a => a.categoryId === training.categoryId && a.status === 'ativo').length;
+    // Roster for this training (including exceptions if Grandes)
+    const expectedAthletes = store.getAthletesForTraining(training);
     const presentCount = training.attendance.filter(a => a.status === 'presente').length;
-    const rate = totalAthletesInCat > 0 ? Math.round((presentCount / totalAthletesInCat) * 100) : 0;
+    const rate = expectedAthletes.length > 0 ? Math.round((presentCount / expectedAthletes.length) * 100) : 0;
+
+    // Check if there are exceptions
+    const exceptionsInTraining = expectedAthletes.filter(a => a.groupId === 'pequenos' && a.playsUp === true);
 
     return `
       <div class="training-card ${isToday ? 'today' : ''}" data-id="${training.id}">
@@ -90,12 +92,21 @@ export function renderTrainings() {
             <span class="training-date-day">${formatDate(training.date)}</span>
             <span class="training-time">${training.startTime} - ${training.endTime}</span>
           </div>
-          ${renderCategoryBadge(training.categoryId)}
+          <div>
+            ${renderGroupBadge(training.groupId)}
+          </div>
         </div>
 
         <div class="training-focus">
           ${training.focus || 'Treino Técnico/Tático'}
         </div>
+
+        ${training.groupId === 'grandes' && exceptionsInTraining.length > 0 ? `
+          <div style="font-size: 0.74rem; color: #f59e0b; background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); padding: 5px 8px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <span>⚡</span>
+            <span>Inclui <strong>${exceptionsInTraining.length} atletas de exceção</strong> dos Pequenos</span>
+          </div>
+        ` : ''}
 
         <div class="training-meta">
           <div class="training-meta-item">
@@ -113,7 +124,7 @@ export function renderTrainings() {
             Status: <span style="color: ${isDone ? '#10b981' : '#38bdf8'}; font-weight: 700;">${isDone ? 'Concluído' : 'Agendado'}</span>
           </div>
           <div>
-            Presença: <span style="color: ${rate >= 75 ? '#10b981' : rate >= 50 ? '#f59e0b' : '#ef4444'}">${presentCount}/${totalAthletesInCat} (${rate}%)</span>
+            Presença: <span style="color: ${rate >= 75 ? '#10b981' : rate >= 50 ? '#f59e0b' : '#ef4444'}">${presentCount}/${expectedAthletes.length} (${rate}%)</span>
           </div>
         </div>
 
@@ -159,6 +170,12 @@ function setupEventListeners() {
     btnNewTraining.addEventListener('click', () => openTrainingModal());
   }
 
+  // Quick action: Generate weekly schedule with official days
+  const btnGenWeekly = document.getElementById('btnGenerateWeeklySchedule');
+  if (btnGenWeekly) {
+    btnGenWeekly.addEventListener('click', () => generateWeeklySchedule());
+  }
+
   const formTraining = document.getElementById('trainingForm');
   if (formTraining) {
     formTraining.addEventListener('submit', (e) => {
@@ -191,6 +208,7 @@ export function openTrainingModal(trainingId = null) {
   const modalTitle = document.getElementById('trainingModalTitle');
   const form = document.getElementById('trainingForm');
   const trainingIdInput = document.getElementById('trainingFormId');
+  const groupSelect = document.getElementById('trainingFormGroup');
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -200,7 +218,7 @@ export function openTrainingModal(trainingId = null) {
     if (modalTitle) modalTitle.textContent = 'Editar Treino';
     if (trainingIdInput) trainingIdInput.value = training.id;
 
-    document.getElementById('trainingFormCategory').value = training.categoryId;
+    if (groupSelect) groupSelect.value = training.groupId || 'pequenos';
     document.getElementById('trainingFormDate').value = training.date;
     document.getElementById('trainingFormStartTime').value = training.startTime;
     document.getElementById('trainingFormEndTime').value = training.endTime;
@@ -211,6 +229,7 @@ export function openTrainingModal(trainingId = null) {
     if (modalTitle) modalTitle.textContent = 'Agendar Novo Treino';
     if (trainingIdInput) trainingIdInput.value = '';
     form.reset();
+    if (groupSelect) groupSelect.value = 'pequenos';
     document.getElementById('trainingFormDate').value = todayStr;
     document.getElementById('trainingFormStartTime').value = '16:00';
     document.getElementById('trainingFormEndTime').value = '17:30';
@@ -223,8 +242,11 @@ export function openTrainingModal(trainingId = null) {
 
 function saveTrainingFromForm() {
   const trainingId = document.getElementById('trainingFormId').value;
+  const groupId = document.getElementById('trainingFormGroup').value;
+
   const data = {
-    categoryId: document.getElementById('trainingFormCategory').value,
+    groupId,
+    categoryId: 'all',
     date: document.getElementById('trainingFormDate').value,
     startTime: document.getElementById('trainingFormStartTime').value,
     endTime: document.getElementById('trainingFormEndTime').value,
@@ -256,12 +278,13 @@ export function openAttendanceCheckinModal(trainingId) {
   if (!training) return;
   currentCheckinTrainingId = trainingId;
 
-  const cat = getCategoryById(training.categoryId);
-  const athletes = store.getAthletes().filter(a => a.categoryId === training.categoryId && a.status === 'ativo');
+  const grp = getGroupById(training.groupId);
+  // Get roster: includes all athletes for this training (and exceptions if Grandes)
+  const athletes = store.getAthletesForTraining(training);
 
   const titleEl = document.getElementById('checkinModalTitle');
   const subtitleEl = document.getElementById('checkinModalSubtitle');
-  if (titleEl) titleEl.textContent = `Chamada: ${cat.name}`;
+  if (titleEl) titleEl.textContent = `Chamada: ${grp.name}`;
   if (subtitleEl) subtitleEl.textContent = `Treino do dia ${formatDate(training.date)} • ${training.startTime} às ${training.endTime} (${training.location})`;
 
   const listContainer = document.getElementById('attendanceChecklist');
@@ -270,7 +293,7 @@ export function openAttendanceCheckinModal(trainingId) {
   if (athletes.length === 0) {
     listContainer.innerHTML = `
       <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-        Nenhum atleta ativo cadastrado nesta categoria (${cat.name}).
+        Nenhum atleta ativo encontrado para esta turma (${grp.name}).
       </div>
     `;
     openModal('attendanceModal');
@@ -280,9 +303,11 @@ export function openAttendanceCheckinModal(trainingId) {
   // Build checklist
   listContainer.innerHTML = athletes.map(athlete => {
     const existing = training.attendance.find(a => a.athleteId === athlete.id);
-    const status = existing ? existing.status : 'presente'; // default to presente for rapid check
+    const status = existing ? existing.status : 'presente';
     const note = existing ? existing.note || '' : '';
     const initials = getInitials(athlete.name);
+    const cat = getCategoryById(athlete.categoryId);
+    const isException = athlete.groupId === 'pequenos' && training.groupId === 'grandes';
 
     return `
       <div class="attendance-item" data-athlete-id="${athlete.id}">
@@ -291,8 +316,15 @@ export function openAttendanceCheckinModal(trainingId) {
             ${initials}
           </div>
           <div>
-            <div style="font-weight: 700; font-size: 0.9rem;">${athlete.name}</div>
-            <div style="font-size: 0.74rem; color: var(--text-dim);">${athlete.position || 'Atleta'}</div>
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-weight: 700; font-size: 0.92rem;">${athlete.name}</span>
+              ${isException ? `
+                <span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.68rem; padding: 2px 7px; border-radius: 99px; font-weight: 800;" title="Atleta dos Pequenos jogando no Grande">
+                  ⚡ Exceção (Pequeno no Grande)
+                </span>
+              ` : ''}
+            </div>
+            <div style="font-size: 0.74rem; color: var(--text-dim);">${cat.name} • ${athlete.position || 'Atleta'}</div>
           </div>
         </div>
 
@@ -348,7 +380,7 @@ function updateAttendanceSummaryCounters() {
       <span style="color: #10b981; font-weight: 800;">${pres} Presentes</span> • 
       <span style="color: #ef4444; font-weight: 800;">${aus} Faltas</span> • 
       <span style="color: #f59e0b; font-weight: 800;">${just} Justificadas</span> • 
-      <span style="color: #38bdf8; font-weight: 800;">${rate}% Presença</span>
+      <span style="color: #38bdf8; font-weight: 800;">${rate}% Presença (${total} convocados)</span>
     `;
   }
 }
@@ -372,5 +404,92 @@ function saveAttendanceCheckin() {
   store.saveAttendance(currentCheckinTrainingId, attendanceArray);
   showToast('Chamada de presença salva com sucesso!', 'success');
   closeModal('attendanceModal');
+  renderTrainings();
+}
+
+function generateWeeklySchedule() {
+  if (!confirm('Deseja criar a grade de treinos padrão para a semana atual (Pequenos: Ter/Qui/Sáb e Grandes: Seg/Qui/Sáb)?')) return;
+
+  const now = new Date();
+  // Find current Monday
+  const day = now.getDay();
+  const diffToMonday = now.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(now.setDate(diffToMonday));
+
+  const formatDateYMD = (d) => d.toISOString().split('T')[0];
+
+  const getDayDate = (offsetDays) => {
+    const target = new Date(monday);
+    target.setDate(monday.getDate() + offsetDays);
+    return formatDateYMD(target);
+  };
+
+  const weeklySchedule = [
+    // Segunda-feira (offset 0): GRANDES
+    {
+      groupId: 'grandes',
+      date: getDayDate(0),
+      startTime: '17:30',
+      endTime: '19:15',
+      location: 'Quadra Principal VOA',
+      coach: 'Prof. Roberto Martins',
+      focus: 'Tática Coletiva e Condicionamento Físico'
+    },
+    // Terça-feira (offset 1): PEQUENOS
+    {
+      groupId: 'pequenos',
+      date: getDayDate(1),
+      startTime: '16:00',
+      endTime: '17:30',
+      location: 'Quadra Principal VOA',
+      coach: 'Prof. Carlos Eduardo',
+      focus: 'Fundamentos de Passe, Drible e Tomada de Decisão'
+    },
+    // Quinta-feira (offset 3): PEQUENOS e GRANDES
+    {
+      groupId: 'pequenos',
+      date: getDayDate(3),
+      startTime: '15:30',
+      endTime: '17:00',
+      location: 'Quadra Principal VOA',
+      coach: 'Prof. Carlos Eduardo',
+      focus: 'Coordenação Motora e Finalização'
+    },
+    {
+      groupId: 'grandes',
+      date: getDayDate(3),
+      startTime: '17:15',
+      endTime: '19:00',
+      location: 'Quadra Principal VOA',
+      coach: 'Profa. Juliana Rossi',
+      focus: 'Transição Ofensiva e Bola Parada (com Atletas de Exceção)'
+    },
+    // Sábado (offset 5): PEQUENOS e GRANDES
+    {
+      groupId: 'pequenos',
+      date: getDayDate(5),
+      startTime: '08:30',
+      endTime: '10:00',
+      location: 'Quadra Principal VOA',
+      coach: 'Prof. Carlos Eduardo',
+      focus: 'Jogos Recreativos e Mini-Torneio'
+    },
+    {
+      groupId: 'grandes',
+      date: getDayDate(5),
+      startTime: '10:15',
+      endTime: '12:00',
+      location: 'Quadra Principal VOA',
+      coach: 'Profa. Juliana Rossi',
+      focus: 'Simulação de Partida Oficial e Coletivo'
+    }
+  ];
+
+  weeklySchedule.forEach(item => {
+    store.addTraining(item);
+  });
+
+  showToast('Grade semanal gerada com sucesso!', 'success');
+  renderTrainingCategoryChips();
   renderTrainings();
 }

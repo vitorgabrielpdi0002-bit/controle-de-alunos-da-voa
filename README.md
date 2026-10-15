@@ -4,27 +4,39 @@ Sistema completo, moderno e intuitivo desenvolvido para a **VOA Sports**, oferec
 
 ---
 
-## ⚡ Principais Funcionalidades
+## ⚡ Organização Oficial das Turmas e Treinos
 
-### 1. 👥 Categorias e Cadastro Completo de Atletas
-- **Categorias Oficiais Configuradas:**
-  - 🔵 **Sub-11 Masculino** e 🟣 **Sub-11 Feminino** (até 11 anos)
-  - 🔵 **Sub-13 Masculino** e 🟣 **Sub-13 Feminino** (12 e 13 anos)
-  - 🟠 **Sub-16 Masculino** e 🟢 **Sub-16 Feminino** (14 a 16 anos)
-  - 🔴 **Sub-18 Masculino** e 🟣 **Sub-18 Feminino** (17 e 18 anos)
-- **Cálculo Automático de Categoria:** Ao informar a data de nascimento e o gênero, o sistema calcula a idade exata e sugere automaticamente a categoria correspondente.
-- **Ficha do Atleta:** Foto/avatar com cores da categoria, posição em quadra/campo, dados dos pais/responsáveis, restrições médicas/alergias e histórico individual.
-- **Link Direto WhatsApp:** Comunicação rápida com os pais com 1 clique.
+### 1. 👥 Estrutura das 2 Turmas Principais
+- 👶 **Turma Pequenos (6 a 14 anos):**
+  - **Dias de Treino:** **Terça-feira, Quinta-feira e Sábado**
+  - Foco em iniciação esportiva, coordenação motora, fundamentos e jogos lúdicos.
+- 🏆 **Turma Grandes (14 anos acima):**
+  - **Dias de Treino:** **Segunda-feira, Quinta-feira e Sábado**
+  - Foco em tática coletiva, condicionamento físico, força e alta intensidade.
+- ⚡ **Atletas de Exceção ("Jogam no Grande"):**
+  - Atletas que têm idade dos Pequenos (ex: Sub-13 destaque), mas que **treinam e jogam também na Turma dos Grandes**.
+  - O sistema identifica esses atletas com badge especial `⚡ Joga no Grande (Exceção)`.
+  - Na chamada de presença do treino dos Grandes, os atletas de exceção **aparecem automaticamente na lista de presença**, permitindo registrar sua frequência!
+
+### 2. 🏅 Categorias de Base e Competição
+Para efeitos de federação, torneios e fichas cadastrais, os atletas continuam classificados por faixas etárias:
+- 🔵 **Sub-11 Masculino** e 🟣 **Sub-11 Feminino** (6 a 11 anos • Turma Pequenos)
+- 🔵 **Sub-13 Masculino** e 🟣 **Sub-13 Feminino** (12 e 13 anos • Turma Pequenos / Exceções)
+- 🟠 **Sub-16 Masculino** e 🟢 **Sub-16 Feminino** (14 a 16 anos • Turma Grandes)
+- 🔴 **Sub-18 Masculino** e 🟣 **Sub-18 Feminino** (17 e 18 anos • Turma Grandes)
 
 ---
 
-### 2. 📅 Agenda de Treinos & Controle de Participação (Frequência)
-- **Cronograma de Treinos:** Agendamento por categoria, data, horários, local/quadra, treinador responsável e foco técnico/tático.
-- **Chamada Interativa em Tempo Real (Check-in na Quadra):**
+## 📅 Agenda de Treinos & Chamada de Presença
+- **Gerar Grade Semanal Automática:** Botão com 1 clique para gerar os treinos oficiais da semana:
+  - **Segunda-feira:** Turma Grandes (17:30 - 19:15)
+  - **Terça-feira:** Turma Pequenos (16:00 - 17:30)
+  - **Quinta-feira:** Turma Pequenos (15:30 - 17:00) e Turma Grandes (17:15 - 19:00)
+  - **Sábado:** Turma Pequenos (08:30 - 10:00) e Turma Grandes (10:15 - 12:00)
+- **Chamada Interativa na Quadra:**
   - Botão **"Marcar Todos como Presentes"** para agilidade do treinador.
   - Seleção rápida de **Presente**, **Falta** e **Falta Justificada**.
-  - Campo para anotações individuais do treino (ex: atrasos, lesão ou desempenho).
-  - Cálculo automático da **Taxa de Presença (%)** do atleta e da categoria.
+  - Contador ao vivo e taxa de presença.
 
 ---
 
