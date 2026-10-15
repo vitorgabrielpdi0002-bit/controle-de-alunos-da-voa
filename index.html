@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Alunos da VOA - Treinos, Frequência e Mensalidades</title>
+  <meta name="description" content="Sistema completo de gestão esportiva da VOA Sports: controle de atletas por categorias Sub-11, Sub-13, Sub-16 e Sub-18 (M/F), agenda de treinos, lista de presença e controle de mensalidades.">
+  <link rel="icon" type="image/jpeg" href="/assets/logo.jpg">
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="brand-section">
+        <img src="/assets/logo.jpg" alt="VOA Sports Academy" class="brand-logo-img">
+        <div class="brand-info">
+          <h1>VOA SPORTS</h1>
+          <span>Gestão de Atletas</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-label">Módulos</div>
+        <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="#athletes" class="nav-item" data-tab="athletes">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Atletas & Categorias</span>
+          <span class="nav-badge" id="sidebarAthletesCount">16</span>
+        </a>
+
+        <a href="#trainings" class="nav-item" data-tab="trainings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+          <span>Agenda & Presença</span>
+        </a>
+
+        <a href="#finances" class="nav-item" data-tab="finances">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+          <span>Mensalidades</span>
+        </a>
+
+        <a href="#reports" class="nav-item" data-tab="reports">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          <span>Relatórios & Config</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="nav-label" style="padding: 0 0 6px;">Categorias VOA</div>
+        <div class="category-quick-pills">
+          <span class="quick-pill" style="background: rgba(6,182,212,0.18); color: #06b6d4;">Sub-11 M</span>
+          <span class="quick-pill" style="background: rgba(236,72,153,0.18); color: #ec4899;">Sub-11 F</span>
+          <span class="quick-pill" style="background: rgba(59,130,246,0.18); color: #3b82f6;">Sub-13 M</span>
+          <span class="quick-pill" style="background: rgba(139,92,246,0.18); color: #8b5cf6;">Sub-13 F</span>
+          <span class="quick-pill" style="background: rgba(245,158,11,0.18); color: #f59e0b;">Sub-16 M</span>
+          <span class="quick-pill" style="background: rgba(16,185,129,0.18); color: #10b981;">Sub-16 F</span>
+          <span class="quick-pill" style="background: rgba(239,68,68,0.18); color: #ef4444;">Sub-18 M</span>
+          <span class="quick-pill" style="background: rgba(217,70,239,0.18); color: #d946ef;">Sub-18 F</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Container -->
+    <main class="app-main">
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Abrir Menu">☰</button>
+          <div class="page-title-box">
+            <h2 id="headerPageTitle">Dashboard Executivo</h2>
+            <p id="headerPageSubtitle">Visão geral de treinos, atletas e financeiro da academia</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn btn-secondary btn-icon" id="btnThemeToggle" title="Alternar Tema Claro/Escuro">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ==========================================
+           TAB 1: DASHBOARD
+           ========================================== -->
+      <section class="page-view active" id="view-dashboard">
+        <!-- Top Metrics Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Atletas Ativos</span>
+              <span class="kpi-value" id="dashKpiAthletes">16</span>
+              <span class="kpi-subtext">Distribuídos em 8 categorias</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Treinos Agendados</span>
+              <span class="kpi-value" id="dashKpiTrainings">2 hoje</span>
+              <span class="kpi-subtext">Chamada em tempo real</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Arrecadação Mês</span>
+              <span class="kpi-value" id="dashKpiCollected">R$ 1.340,00</span>
+              <span class="kpi-subtext">Mensalidades recebidas</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Em Atraso</span>
+              <span class="kpi-value" id="dashKpiLate" style="color: #ef4444;">5 pendências</span>
+              <span class="kpi-subtext">Lembretes WhatsApp disponíveis</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Columns Grid: Today Trainings & Financial Alerts -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-bottom: 28px;">
+          <!-- Left: Trainings of Today / Next -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+              <h3 style="font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;" id="dashTrainingsTitle">
+                Treinos de Hoje
+              </h3>
+              <button class="btn btn-secondary btn-sm" id="dashBtnNewTraining">
+                + Novo Treino
+              </button>
+            </div>
+
+            <div id="dashTodayTrainingsList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Right: Late Payments & WhatsApp Reminders -->
+          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+              <h3 style="font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                Alertas Financeiros do Mês
+              </h3>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Ação Rápida</span>
+            </div>
+
+            <div id="dashFinancialAlertsList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom: Category Breakdown Progress -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 800;">Atletas por Categoria</h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">Divisão oficial Sub-11, 13, 16 e 18 (Masculino e Feminino)</p>
+            </div>
+            <button class="btn btn-primary btn-sm" id="dashBtnNewAthlete">
+              + Cadastrar Atleta
+            </button>
+          </div>
+
+          <div id="dashCategoryStatsContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: ATLETAS
+           ========================================== -->
+      <section class="page-view" id="view-athletes">
+        <!-- Category Filter Chips -->
+        <div class="category-filter-chips" id="athleteCategoryChips">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="filter-bar">
+          <div class="filter-group-left">
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" class="search-input" id="searchAthletes" placeholder="Buscar por nome, apelido, responsável ou posição...">
+            </div>
+            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);" id="athletesCountBadge">16 atletas</span>
+          </div>
+
+          <div>
+            <button class="btn btn-primary" id="btnNewAthlete">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              Novo Atleta
+            </button>
+          </div>
+        </div>
+
+        <!-- Athletes Cards Grid -->
+        <div class="athlete-grid" id="athletesContainer">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: AGENDA & TREINOS (FREQUÊNCIA)
+           ========================================== -->
+      <section class="page-view" id="view-trainings">
+        <!-- Category Filter Chips -->
+        <div class="category-filter-chips" id="trainingCategoryChips">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800;">Cronograma de Treinos</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Realize a chamada de presença e acompanhe faltas e justificativas</p>
+          </div>
+
+          <div>
+            <button class="btn btn-primary" id="btnNewTraining">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              Agendar Novo Treino
+            </button>
+          </div>
+        </div>
+
+        <!-- Trainings Grid -->
+        <div class="training-cards-grid" id="trainingsContainer">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: MENSALIDADES
+           ========================================== -->
+      <section class="page-view" id="view-finances">
+        <!-- Financial KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Total Arrecadado</span>
+              <span class="kpi-value" id="kpiTotalCollected" style="color: #10b981;">R$ 0,00</span>
+              <span class="kpi-subtext">Mensalidades quitadas</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Pendente a Vencer</span>
+              <span class="kpi-value" id="kpiTotalPending" style="color: #f59e0b;">R$ 0,00</span>
+              <span class="kpi-subtext">Dentro do prazo legal</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Em Atraso</span>
+              <span class="kpi-value" id="kpiTotalLate" style="color: #ef4444;">R$ 0,00</span>
+              <span class="kpi-subtext">Passou do vencimento</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon-wrapper" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 9-5 5-4-4-3 3"/><path d="M3 3v18h18"/></svg>
+            </div>
+            <div class="kpi-info">
+              <span class="kpi-title">Taxa de Adimplência</span>
+              <span class="kpi-value" id="kpiAdherenceRate" style="color: #38bdf8;">0%</span>
+              <span class="kpi-subtext">Alunos pagantes em dia</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Month Navigation Bar -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn btn-secondary btn-sm" id="btnPrevMonth" title="Mês Anterior">◀ Mês Anterior</button>
+            <div style="font-size: 1.15rem; font-weight: 800; min-width: 190px; text-align: center; color: #38bdf8;" id="financeMonthDisplay">
+              Outubro de 2026
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btnNextMonth" title="Próximo Mês">Próximo Mês ▶</button>
+            <button class="btn btn-secondary btn-sm" id="btnCurrentMonth">Mês Atual</button>
+          </div>
+        </div>
+
+        <!-- Filters & Search for Payments -->
+        <div class="filter-bar">
+          <div class="filter-group-left">
+            <div class="search-input-wrapper">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" class="search-input" id="searchPayment" placeholder="Buscar aluno ou responsável...">
+            </div>
+
+            <select class="custom-select" id="filterPaymentStatus">
+              <option value="all">Todos os Status</option>
+              <option value="pago">Apenas Pagos</option>
+              <option value="pendente">Apenas Pendentes</option>
+              <option value="atrasado">Apenas Atrasados</option>
+              <option value="isento">Apenas Bolsistas</option>
+            </select>
+
+            <select class="custom-select" id="filterPaymentCategory">
+              <option value="all">Todas as Categorias</option>
+              <option value="sub11_m">Sub-11 Masculino</option>
+              <option value="sub11_f">Sub-11 Feminino</option>
+              <option value="sub13_m">Sub-13 Masculino</option>
+              <option value="sub13_f">Sub-13 Feminino</option>
+              <option value="sub16_m">Sub-16 Masculino</option>
+              <option value="sub16_f">Sub-16 Feminino</option>
+              <option value="sub18_m">Sub-18 Masculino</option>
+              <option value="sub18_f">Sub-18 Feminino</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Atleta</th>
+                <th>Responsável / Contato</th>
+                <th>Vencimento</th>
+                <th>Valor</th>
+                <th>Status Pagamento</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: RELATÓRIOS & CONFIGURAÇÕES
+           ========================================== -->
+      <section class="page-view" id="view-reports">
+        <!-- Breakdown per category -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 6px;">Quadro Geral por Categoria</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Comparativo de atletas, taxa de presença média nos treinos e arrecadação do mês.</p>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Categoria</th>
+                  <th>Atletas Ativos</th>
+                  <th>Presença Média</th>
+                  <th>Recebido (Mês)</th>
+                  <th>Pendente (Mês)</th>
+                </tr>
+              </thead>
+              <tbody id="categoryBreakdownTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Export & Backup Options -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px;">
+          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px;">Exportação de Planilhas</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Baixe os dados formatados em arquivo CSV para Excel ou Google Planilhas.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="btn btn-secondary" id="btnExportAthletesCSV">
+                Exportar Lista de Atletas (CSV)
+              </button>
+              <button class="btn btn-secondary" id="btnExportFinancesCSV">
+                Exportar Controle Financeiro do Mês (CSV)
+              </button>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
+            <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px;">Segurança & Backup dos Dados</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Exporte uma cópia completa dos atletas, treinos e pagamentos, ou restaure em outro computador.</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button class="btn btn-secondary" id="btnExportBackupJSON">
+                Fazer Download do Backup (JSON)
+              </button>
+              
+              <label class="btn btn-secondary" style="cursor: pointer; text-align: center;">
+                Restaurar Backup de Arquivo
+                <input type="file" id="inputImportJSON" accept=".json" style="display: none;">
+              </label>
+
+              <button class="btn btn-danger btn-sm" id="btnResetDemoData" style="margin-top: 6px;">
+                Restaurar Dados Padrão de Demonstração
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academy Configuration Settings -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
+          <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 6px;">Dados da Academia (Usados em Recibos e WhatsApp)</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Configure o nome da instituição, chave Pix de recebimento e contato.</p>
+
+          <form id="academyConfigForm">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Nome da Academia / Clube</label>
+                <input type="text" class="form-input" id="cfgAcademyName" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">CNPJ (Opcional)</label>
+                <input type="text" class="form-input" id="cfgCnpj">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chave Pix para Cobrança</label>
+                <input type="text" class="form-input" id="cfgPixKey" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tipo de Chave Pix</label>
+                <select class="form-select" id="cfgPixType">
+                  <option value="Email">Email</option>
+                  <option value="Telefone">Telefone / Celular</option>
+                  <option value="CNPJ">CNPJ</option>
+                  <option value="Chave Aleatória">Chave Aleatória</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Telefone / WhatsApp Oficial</label>
+                <input type="text" class="form-input" id="cfgPhone">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Endereço dos Treinos</label>
+                <input type="text" class="form-input" id="cfgAddress">
+              </div>
+              <div class="form-group full-width" style="margin-top: 10px;">
+                <button type="submit" class="btn btn-primary" style="align-self: flex-start;">
+                  Salvar Configurações
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==========================================
+       MODAIS
+       ========================================== -->
+
+  <!-- MODAL 1: Cadastro / Edição de Atleta -->
+  <div class="modal-overlay" id="athleteModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 id="athleteModalTitle">Novo Atleta</h3>
+        <button class="modal-close-btn" data-close-modal="athleteModal" aria-label="Fechar">✕</button>
+      </div>
+      <form id="athleteForm">
+        <div class="modal-body">
+          <input type="hidden" id="athleteFormId">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Nome Completo do Atleta <span class="req">*</span></label>
+              <input type="text" class="form-input" id="athleteFormName" placeholder="Ex: Gabriel Henrique Duarte" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Apelido / Como gosta de ser chamado</label>
+              <input type="text" class="form-input" id="athleteFormNickname" placeholder="Ex: Biel">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Data de Nascimento <span class="req">*</span></label>
+              <input type="date" class="form-input" id="athleteFormBirthDate" required>
+              <span class="form-hint" id="athleteAgeFeedback" style="color: #38bdf8; font-weight: 700;"></span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Gênero <span class="req">*</span></label>
+              <select class="form-select" id="athleteFormGender" required>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Categoria Oficial <span class="req">*</span></label>
+              <select class="form-select" id="athleteFormCategory" required>
+                <option value="sub11_m">Sub-11 Masculino (até 11 anos)</option>
+                <option value="sub11_f">Sub-11 Feminino (até 11 anos)</option>
+                <option value="sub13_m">Sub-13 Masculino (12 a 13 anos)</option>
+                <option value="sub13_f">Sub-13 Feminino (12 a 13 anos)</option>
+                <option value="sub16_m">Sub-16 Masculino (14 a 16 anos)</option>
+                <option value="sub16_f">Sub-16 Feminino (14 a 16 anos)</option>
+                <option value="sub18_m">Sub-18 Masculino (17 a 18 anos)</option>
+                <option value="sub18_f">Sub-18 Feminino (17 a 18 anos)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nome do Responsável (Pai/Mãe/Tutor)</label>
+              <input type="text" class="form-input" id="athleteFormGuardian" placeholder="Ex: Marcelo Duarte (Pai)">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">WhatsApp do Responsável</label>
+              <input type="text" class="form-input" id="athleteFormGuardianPhone" placeholder="Ex: 11998765432">
+              <span class="form-hint">Usado para lembretes e avisos rápidos com 1 clique</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Telefone do Atleta (Se houver)</label>
+              <input type="text" class="form-input" id="athleteFormAthletePhone" placeholder="Ex: 11987654321">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Posição / Especialidade</label>
+              <input type="text" class="form-input" id="athleteFormPosition" placeholder="Ex: Goleiro, Meio-Campo, Atacante">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Valor da Mensalidade (R$) <span class="req">*</span></label>
+              <input type="number" step="0.01" class="form-input" id="athleteFormFee" value="140" required>
+              <span class="form-hint">Coloque 0 se for Atleta Bolsista</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Dia do Vencimento <span class="req">*</span></label>
+              <select class="form-select" id="athleteFormDueDay" required>
+                <option value="5">Dia 05</option>
+                <option value="10" selected>Dia 10</option>
+                <option value="15">Dia 15</option>
+                <option value="20">Dia 20</option>
+                <option value="25">Dia 25</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Status do Aluno</label>
+              <select class="form-select" id="athleteFormStatus">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo / Trancado</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Observações Médicas / Restrições / Alergias</label>
+              <textarea class="form-textarea" id="athleteFormNotes" placeholder="Informações relevantes sobre saúde, remédios ou restrições..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="athleteModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Atleta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Ficha / Detalhes do Atleta -->
+  <div class="modal-overlay" id="athleteDetailsModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3>Ficha Completa do Atleta</h3>
+        <button class="modal-close-btn" data-close-modal="athleteDetailsModal" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body" id="athleteDetailsContent">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button type="button" class="btn btn-danger btn-sm" id="btnDeleteAthlete">Excluir Cadastro</button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-secondary" data-close-modal="athleteDetailsModal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="btnEditAthleteDetail">Editar Dados</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Agendar Treino -->
+  <div class="modal-overlay" id="trainingModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="trainingModalTitle">Agendar Novo Treino</h3>
+        <button class="modal-close-btn" data-close-modal="trainingModal" aria-label="Fechar">✕</button>
+      </div>
+      <form id="trainingForm">
+        <div class="modal-body">
+          <input type="hidden" id="trainingFormId">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label">Categoria Convocada <span class="req">*</span></label>
+              <select class="form-select" id="trainingFormCategory" required>
+                <option value="sub11_m">Sub-11 Masculino</option>
+                <option value="sub11_f">Sub-11 Feminino</option>
+                <option value="sub13_m">Sub-13 Masculino</option>
+                <option value="sub13_f">Sub-13 Feminino</option>
+                <option value="sub16_m">Sub-16 Masculino</option>
+                <option value="sub16_f">Sub-16 Feminino</option>
+                <option value="sub18_m">Sub-18 Masculino</option>
+                <option value="sub18_f">Sub-18 Feminino</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Data do Treino <span class="req">*</span></label>
+              <input type="date" class="form-input" id="trainingFormDate" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Horário Início <span class="req">*</span></label>
+              <input type="time" class="form-input" id="trainingFormStartTime" value="16:00" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Horário Término <span class="req">*</span></label>
+              <input type="time" class="form-input" id="trainingFormEndTime" value="17:30" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Local / Quadra</label>
+              <input type="text" class="form-input" id="trainingFormLocation" value="Quadra Principal VOA" placeholder="Ex: Quadra 1, Arena VOA">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Treinador(a) Responsável</label>
+              <input type="text" class="form-input" id="trainingFormCoach" value="Prof. Carlos Eduardo">
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Foco do Treino / Tema Técnico</label>
+              <input type="text" class="form-input" id="trainingFormFocus" placeholder="Ex: Fundamentos de Passe, Finalização e Coletivo">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="trainingModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Treino</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Chamada Interativa de Presença -->
+  <div class="modal-overlay" id="attendanceModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div>
+          <h3 id="checkinModalTitle">Chamada de Treino</h3>
+          <p id="checkinModalSubtitle" style="font-size: 0.8rem; color: var(--text-muted);"></p>
+        </div>
+        <button class="modal-close-btn" data-close-modal="attendanceModal" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <div id="attendanceLiveCount" style="font-size: 0.85rem;">
+            <!-- Live counters -->
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btnMarkAllPresent">
+            ✓ Marcar Todos como Presentes
+          </button>
+        </div>
+
+        <div class="attendance-checklist" id="attendanceChecklist">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal="attendanceModal">Fechar sem Salvar</button>
+        <button type="button" class="btn btn-success" id="btnSaveAttendance">Salvar Presença</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: Registrar Pagamento de Mensalidade -->
+  <div class="modal-overlay" id="recordPaymentModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Dar Baixa na Mensalidade</h3>
+        <button class="modal-close-btn" data-close-modal="recordPaymentModal" aria-label="Fechar">✕</button>
+      </div>
+      <form id="recordPaymentForm">
+        <div class="modal-body">
+          <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 18px; font-size: 0.88rem;">
+            <div style="font-weight: 800; font-size: 1.05rem;" id="payModalAthleteName">-</div>
+            <div style="color: var(--text-muted); margin-top: 4px;">
+              Mês de Referência: <strong id="payModalRefMonth" style="color: #38bdf8;">-</strong> • Vencimento: <span id="payModalDueDate">-</span>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Valor Pago (R$) <span class="req">*</span></label>
+              <input type="number" step="0.01" class="form-input" id="payModalAmount" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Data do Pagamento <span class="req">*</span></label>
+              <input type="date" class="form-input" id="payModalDate" required>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Forma de Pagamento <span class="req">*</span></label>
+              <select class="form-select" id="payModalMethod" required>
+                <option value="Pix">Pix</option>
+                <option value="Dinheiro">Dinheiro em Espécie</option>
+                <option value="Cartão de Débito">Cartão de Débito</option>
+                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                <option value="Transferência Bancária">Transferência / TED</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label">Observações / Comprovante</label>
+              <input type="text" class="form-input" id="payModalNotes" placeholder="Ex: Comprovante enviado via WhatsApp pelo pai">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="recordPaymentModal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 6: Recibo de Pagamento -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3>Recibo Oficial VOA Sports</h3>
+        <button class="modal-close-btn" data-close-modal="receiptModal" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body" id="receiptPrintableContent" style="padding: 10px;">
+        <!-- Dynamically populated -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-close-modal="receiptModal">Fechar</button>
+        <button type="button" class="btn btn-primary" id="btnPrintReceiptAction">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+          Imprimir / Salvar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Main Application Script -->
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

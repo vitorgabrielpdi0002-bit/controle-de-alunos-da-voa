@@ -1,0 +1,85 @@
+# 🦅 VOA Sports - Sistema de Gestão de Atletas, Frequência e Mensalidades
+
+Sistema completo, moderno e intuitivo desenvolvido para a **VOA Sports**, oferecendo controle total de atletas das categorias de base e rendimento, agenda e chamadas de treino em tempo real, além de gestão financeira com baixa de mensalidades, recibos oficiais e integração com WhatsApp.
+
+---
+
+## ⚡ Principais Funcionalidades
+
+### 1. 👥 Categorias e Cadastro Completo de Atletas
+- **Categorias Oficiais Configuradas:**
+  - 🔵 **Sub-11 Masculino** e 🟣 **Sub-11 Feminino** (até 11 anos)
+  - 🔵 **Sub-13 Masculino** e 🟣 **Sub-13 Feminino** (12 e 13 anos)
+  - 🟠 **Sub-16 Masculino** e 🟢 **Sub-16 Feminino** (14 a 16 anos)
+  - 🔴 **Sub-18 Masculino** e 🟣 **Sub-18 Feminino** (17 e 18 anos)
+- **Cálculo Automático de Categoria:** Ao informar a data de nascimento e o gênero, o sistema calcula a idade exata e sugere automaticamente a categoria correspondente.
+- **Ficha do Atleta:** Foto/avatar com cores da categoria, posição em quadra/campo, dados dos pais/responsáveis, restrições médicas/alergias e histórico individual.
+- **Link Direto WhatsApp:** Comunicação rápida com os pais com 1 clique.
+
+---
+
+### 2. 📅 Agenda de Treinos & Controle de Participação (Frequência)
+- **Cronograma de Treinos:** Agendamento por categoria, data, horários, local/quadra, treinador responsável e foco técnico/tático.
+- **Chamada Interativa em Tempo Real (Check-in na Quadra):**
+  - Botão **"Marcar Todos como Presentes"** para agilidade do treinador.
+  - Seleção rápida de **Presente**, **Falta** e **Falta Justificada**.
+  - Campo para anotações individuais do treino (ex: atrasos, lesão ou desempenho).
+  - Cálculo automático da **Taxa de Presença (%)** do atleta e da categoria.
+
+---
+
+### 3. 💰 Controle Financeiro & Mensalidades
+- **Acompanhamento de Status:**
+  - 🟢 **PAGO:** Identifica data do pagamento, método (Pix, Cartão, Dinheiro, TED) e recibo.
+  - 🟡 **PENDENTE:** Mensalidade do mês dentro do prazo de vencimento.
+  - 🔴 **EM ATRASO:** Identificação visual imediata de mensalidades vencidas não pagas.
+  - 🟣 **ISENTO / BOLSISTA:** Tratamento específico para atletas com bolsa integral.
+- **Indicadores Financeiros (KPIs):**
+  - Total Arrecadado no Mês
+  - Total Pendente a Vencer
+  - Total em Atraso
+  - Taxa de Adimplência (%)
+- **Ações Rápidas:**
+  - **Dar Baixa / Registrar Pagamento:** Registra o valor, método de pagamento e gera código de recibo.
+  - **Emitir Recibo Oficial:** Recibo pronto com logotipo da VOA Sports, CNPJ, dados do atleta, valor e assinatura (formatado para impressão ou salvar em PDF).
+  - **Lembrar no WhatsApp:** Mensagem pré-formatada cordial informando o valor, data de vencimento e chave Pix para os pais.
+
+---
+
+### 4. 📊 Dashboard Executivo & Relatórios
+- Painel com resumo dos treinos do dia, alertas urgentes de mensalidades vencidas e distribuição visual dos atletas por categoria.
+- **Exportação CSV:** Exporte listas de atletas e relatórios financeiros para abrir no Excel ou Google Planilhas.
+- **Backup & Restauração JSON:** Faça download de cópia de segurança completa ou restaure em qualquer computador.
+- **Suporte a Tema Escuro e Claro:** Alternância rápida com design esportivo de alto padrão.
+
+---
+
+## 🚀 Como Rodar o Projeto
+
+### Pré-requisitos
+- Node.js instalado (v18+)
+
+### Instalação e Execução
+```bash
+# 1. Instalar as dependências (caso não tenha instalado)
+npm install
+
+# 2. Iniciar o servidor de desenvolvimento
+npm run dev
+```
+
+O sistema estará acessível em: **`http://localhost:5173/`**
+
+### Gerar Pacote de Produção
+```bash
+npm run build
+```
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+- **HTML5 Semântico**
+- **CSS3 Puro** (Design System com variáveis, Glassmorphism, temas Dark/Light e estilização `@media print`)
+- **JavaScript Moderno (ES Modules)**
+- **Vite** (Dev server ultrarrápido)
+- **LocalStorage API** (Persistência dos dados sem necessidade de banco de dados externo)
