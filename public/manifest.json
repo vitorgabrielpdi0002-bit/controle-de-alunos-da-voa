@@ -1,0 +1,21 @@
+{
+  "name": "Vôlei Academy Olympic - VOA",
+  "short_name": "Vôlei Academy",
+  "description": "App de controle de presença, atletas e auto-inscrição da Vôlei Academy Olympic",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c0d10",
+  "theme_color": "#ff6b00",
+  "icons": [
+    {
+      "src": "/assets/logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/assets/logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

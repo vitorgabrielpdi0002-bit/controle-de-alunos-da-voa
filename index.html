@@ -1,823 +1,983 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Alunos da VOA - Treinos, Frequência e Mensalidades</title>
-  <meta name="description" content="Sistema completo de gestão esportiva da VOA Sports: controle de atletas por categorias Sub-11, Sub-13, Sub-16 e Sub-18 (M/F), agenda de treinos, lista de presença e controle de mensalidades.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#090C12">
+  <title>VOA Academy - Chamada, Atletas & Mensalidades</title>
+  <meta name="description" content="App de controle de alunos, chamada rápida de treino e mensalidades para voleibol.">
+
   <link rel="icon" type="image/jpeg" href="/assets/logo.jpg">
-  
+  <link rel="manifest" href="/manifest.json">
+
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  
-  <!-- Main Stylesheet -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
-  <div class="app-container">
-    <!-- Sidebar -->
-    <aside class="app-sidebar" id="appSidebar">
-      <div class="brand-section">
-        <img src="/assets/logo.jpg" alt="VOA Sports Academy" class="brand-logo-img">
-        <div class="brand-info">
-          <h1>VOA SPORTS</h1>
-          <span>Gestão de Atletas</span>
-        </div>
-      </div>
-
-      <nav class="sidebar-nav">
-        <div class="nav-label">Módulos</div>
-        <a href="#dashboard" class="nav-item active" data-tab="dashboard">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-          <span>Dashboard</span>
-        </a>
-
-        <a href="#athletes" class="nav-item" data-tab="athletes">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Atletas & Categorias</span>
-          <span class="nav-badge" id="sidebarAthletesCount">16</span>
-        </a>
-
-        <a href="#trainings" class="nav-item" data-tab="trainings">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-          <span>Agenda & Presença</span>
-        </a>
-
-        <a href="#finances" class="nav-item" data-tab="finances">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-          <span>Mensalidades</span>
-        </a>
-
-        <a href="#reports" class="nav-item" data-tab="reports">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-          <span>Relatórios & Config</span>
-        </a>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="nav-label" style="padding: 0 0 6px;">Turmas de Treino</div>
-        <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
-          <div style="background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.3); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.72rem;">
-            <div style="font-weight: 800; color: #06b6d4;">👶 Turma Pequenos (6-14)</div>
-            <div style="color: var(--text-muted); font-size: 0.68rem;">Terça, Quinta e Sábado</div>
-          </div>
-          <div style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-sm); padding: 6px 10px; font-size: 0.72rem;">
-            <div style="font-weight: 800; color: #f59e0b;">🏆 Turma Grandes (14+)</div>
-            <div style="color: var(--text-muted); font-size: 0.68rem;">Segunda, Quinta e Sábado</div>
-          </div>
-        </div>
-
-        <div class="nav-label" style="padding: 0 0 6px;">Categorias de Base</div>
-        <div class="category-quick-pills">
-          <span class="quick-pill" style="background: rgba(6,182,212,0.18); color: #06b6d4;">Sub-11 M</span>
-          <span class="quick-pill" style="background: rgba(236,72,153,0.18); color: #ec4899;">Sub-11 F</span>
-          <span class="quick-pill" style="background: rgba(59,130,246,0.18); color: #3b82f6;">Sub-13 M</span>
-          <span class="quick-pill" style="background: rgba(139,92,246,0.18); color: #8b5cf6;">Sub-13 F</span>
-          <span class="quick-pill" style="background: rgba(245,158,11,0.18); color: #f59e0b;">Sub-16 M</span>
-          <span class="quick-pill" style="background: rgba(16,185,129,0.18); color: #10b981;">Sub-16 F</span>
-          <span class="quick-pill" style="background: rgba(239,68,68,0.18); color: #ef4444;">Sub-18 M</span>
-          <span class="quick-pill" style="background: rgba(217,70,239,0.18); color: #d946ef;">Sub-18 F</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Main Container -->
-    <main class="app-main">
-      <!-- Top Navigation Header -->
-      <header class="top-header">
-        <div class="header-left">
-          <button class="mobile-menu-btn" id="mobileMenuToggle" aria-label="Abrir Menu">☰</button>
-          <div class="page-title-box">
-            <h2 id="headerPageTitle">Dashboard Executivo</h2>
-            <p id="headerPageSubtitle">Visão geral de treinos, atletas e financeiro da academia</p>
-          </div>
-        </div>
-
-        <div class="header-actions">
-          <button class="btn btn-secondary btn-icon" id="btnThemeToggle" title="Alternar Tema Claro/Escuro">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-          </button>
-        </div>
-      </header>
-
-      <!-- ==========================================
-           TAB 1: DASHBOARD
-           ========================================== -->
-      <section class="page-view active" id="view-dashboard">
-        <!-- Top Metrics Cards -->
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Atletas Ativos</span>
-              <span class="kpi-value" id="dashKpiAthletes">16</span>
-              <span class="kpi-subtext">Distribuídos em 8 categorias</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Treinos Agendados</span>
-              <span class="kpi-value" id="dashKpiTrainings">2 hoje</span>
-              <span class="kpi-subtext">Chamada em tempo real</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Arrecadação Mês</span>
-              <span class="kpi-value" id="dashKpiCollected">R$ 1.340,00</span>
-              <span class="kpi-subtext">Mensalidades recebidas</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Em Atraso</span>
-              <span class="kpi-value" id="dashKpiLate" style="color: #ef4444;">5 pendências</span>
-              <span class="kpi-subtext">Lembretes WhatsApp disponíveis</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2 Columns Grid: Today Trainings & Financial Alerts -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-bottom: 28px;">
-          <!-- Left: Trainings of Today / Next -->
-          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
-              <h3 style="font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;" id="dashTrainingsTitle">
-                Treinos de Hoje
-              </h3>
-              <button class="btn btn-secondary btn-sm" id="dashBtnNewTraining">
-                + Novo Treino
-              </button>
-            </div>
-
-            <div id="dashTodayTrainingsList">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <!-- Right: Late Payments & WhatsApp Reminders -->
-          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
-              <h3 style="font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                Alertas Financeiros do Mês
-              </h3>
-              <span style="font-size: 0.78rem; color: var(--text-muted);">Ação Rápida</span>
-            </div>
-
-            <div id="dashFinancialAlertsList">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom: Category Breakdown Progress -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-            <div>
-              <h3 style="font-size: 1.1rem; font-weight: 800;">Atletas por Categoria</h3>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Divisão oficial Sub-11, 13, 16 e 18 (Masculino e Feminino)</p>
-            </div>
-            <button class="btn btn-primary btn-sm" id="dashBtnNewAthlete">
-              + Cadastrar Atleta
-            </button>
-          </div>
-
-          <div id="dashCategoryStatsContainer">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-      </section>
-
-      <!-- ==========================================
-           TAB 2: ATLETAS
-           ========================================== -->
-      <section class="page-view" id="view-athletes">
-        <!-- Category Filter Chips -->
-        <div class="category-filter-chips" id="athleteCategoryChips">
-          <!-- Dynamically populated -->
-        </div>
-
-        <!-- Filter & Search Bar -->
-        <div class="filter-bar">
-          <div class="filter-group-left">
-            <div class="search-input-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <input type="text" class="search-input" id="searchAthletes" placeholder="Buscar por nome, apelido, responsável ou posição...">
-            </div>
-            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);" id="athletesCountBadge">16 atletas</span>
-          </div>
-
-          <div>
-            <button class="btn btn-primary" id="btnNewAthlete">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-              Novo Atleta
-            </button>
-          </div>
-        </div>
-
-        <!-- Athletes Cards Grid -->
-        <div class="athlete-grid" id="athletesContainer">
-          <!-- Dynamically populated -->
-        </div>
-      </section>
-
-      <!-- ==========================================
-           TAB 3: AGENDA & TREINOS (FREQUÊNCIA)
-           ========================================== -->
-      <section class="page-view" id="view-trainings">
-        <!-- Category Filter Chips -->
-        <div class="category-filter-chips" id="trainingCategoryChips">
-          <!-- Dynamically populated -->
-        </div>
-
-        <!-- Filter Bar -->
-        <div class="filter-bar">
-          <div>
-            <h3 style="font-size: 1.1rem; font-weight: 800;">Cronograma de Treinos</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">Realize a chamada de presença e acompanhe faltas e justificativas</p>
-          </div>
-
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-secondary" id="btnGenerateWeeklySchedule" title="Gera automaticamente os treinos de Ter/Qui/Sáb para Pequenos e Seg/Qui/Sáb para Grandes">
-              🗓️ Gerar Grade Semanal
-            </button>
-            <button class="btn btn-primary" id="btnNewTraining">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-              Agendar Novo Treino
-            </button>
-          </div>
-        </div>
-
-        <!-- Trainings Grid -->
-        <div class="training-cards-grid" id="trainingsContainer">
-          <!-- Dynamically populated -->
-        </div>
-      </section>
-
-      <!-- ==========================================
-           TAB 4: MENSALIDADES
-           ========================================== -->
-      <section class="page-view" id="view-finances">
-        <!-- Financial KPIs -->
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Total Arrecadado</span>
-              <span class="kpi-value" id="kpiTotalCollected" style="color: #10b981;">R$ 0,00</span>
-              <span class="kpi-subtext">Mensalidades quitadas</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Pendente a Vencer</span>
-              <span class="kpi-value" id="kpiTotalPending" style="color: #f59e0b;">R$ 0,00</span>
-              <span class="kpi-subtext">Dentro do prazo legal</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Em Atraso</span>
-              <span class="kpi-value" id="kpiTotalLate" style="color: #ef4444;">R$ 0,00</span>
-              <span class="kpi-subtext">Passou do vencimento</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-icon-wrapper" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 9-5 5-4-4-3 3"/><path d="M3 3v18h18"/></svg>
-            </div>
-            <div class="kpi-info">
-              <span class="kpi-title">Taxa de Adimplência</span>
-              <span class="kpi-value" id="kpiAdherenceRate" style="color: #38bdf8;">0%</span>
-              <span class="kpi-subtext">Alunos pagantes em dia</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Month Navigation Bar -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="btn btn-secondary btn-sm" id="btnPrevMonth" title="Mês Anterior">◀ Mês Anterior</button>
-            <div style="font-size: 1.15rem; font-weight: 800; min-width: 190px; text-align: center; color: #38bdf8;" id="financeMonthDisplay">
-              Outubro de 2026
-            </div>
-            <button class="btn btn-secondary btn-sm" id="btnNextMonth" title="Próximo Mês">Próximo Mês ▶</button>
-            <button class="btn btn-secondary btn-sm" id="btnCurrentMonth">Mês Atual</button>
-          </div>
-        </div>
-
-        <!-- Filters & Search for Payments -->
-        <div class="filter-bar">
-          <div class="filter-group-left">
-            <div class="search-input-wrapper">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <input type="text" class="search-input" id="searchPayment" placeholder="Buscar aluno ou responsável...">
-            </div>
-
-            <select class="custom-select" id="filterPaymentGroup">
-              <option value="all">Todas as Turmas</option>
-              <option value="pequenos">Turma Pequenos (6-14 anos)</option>
-              <option value="grandes">Turma Grandes (14+ anos)</option>
-            </select>
-
-            <select class="custom-select" id="filterPaymentStatus">
-              <option value="all">Todos os Status</option>
-              <option value="pago">Apenas Pagos</option>
-              <option value="pendente">Apenas Pendentes</option>
-              <option value="atrasado">Apenas Atrasados</option>
-              <option value="isento">Apenas Bolsistas</option>
-            </select>
-
-            <select class="custom-select" id="filterPaymentCategory">
-              <option value="all">Todas as Categorias</option>
-              <option value="sub11_m">Sub-11 Masculino</option>
-              <option value="sub11_f">Sub-11 Feminino</option>
-              <option value="sub13_m">Sub-13 Masculino</option>
-              <option value="sub13_f">Sub-13 Feminino</option>
-              <option value="sub16_m">Sub-16 Masculino</option>
-              <option value="sub16_f">Sub-16 Feminino</option>
-              <option value="sub18_m">Sub-18 Masculino</option>
-              <option value="sub18_f">Sub-18 Feminino</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Payments Table -->
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Atleta</th>
-                <th>Responsável / Contato</th>
-                <th>Vencimento</th>
-                <th>Valor</th>
-                <th>Status Pagamento</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="paymentsTableBody">
-              <!-- Dynamically populated -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ==========================================
-           TAB 5: RELATÓRIOS & CONFIGURAÇÕES
-           ========================================== -->
-      <section class="page-view" id="view-reports">
-        <!-- Breakdown per category -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px;">
-          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 6px;">Quadro Geral por Categoria</h3>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Comparativo de atletas, taxa de presença média nos treinos e arrecadação do mês.</p>
-
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Categoria</th>
-                  <th>Atletas Ativos</th>
-                  <th>Presença Média</th>
-                  <th>Recebido (Mês)</th>
-                  <th>Pendente (Mês)</th>
-                </tr>
-              </thead>
-              <tbody id="categoryBreakdownTableBody">
-                <!-- Dynamically populated -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Export & Backup Options -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px;">
-          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
-            <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px;">Exportação de Planilhas</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Baixe os dados formatados em arquivo CSV para Excel ou Google Planilhas.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <button class="btn btn-secondary" id="btnExportAthletesCSV">
-                Exportar Lista de Atletas (CSV)
-              </button>
-              <button class="btn btn-secondary" id="btnExportFinancesCSV">
-                Exportar Controle Financeiro do Mês (CSV)
-              </button>
-            </div>
-          </div>
-
-          <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
-            <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 8px;">Segurança & Backup dos Dados</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Exporte uma cópia completa dos atletas, treinos e pagamentos, ou restaure em outro computador.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <button class="btn btn-secondary" id="btnExportBackupJSON">
-                Fazer Download do Backup (JSON)
-              </button>
-              
-              <label class="btn btn-secondary" style="cursor: pointer; text-align: center;">
-                Restaurar Backup de Arquivo
-                <input type="file" id="inputImportJSON" accept=".json" style="display: none;">
-              </label>
-
-              <button class="btn btn-danger btn-sm" id="btnResetDemoData" style="margin-top: 6px;">
-                Restaurar Dados Padrão de Demonstração
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Academy Configuration Settings -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 24px;">
-          <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 6px;">Dados da Academia (Usados em Recibos e WhatsApp)</h3>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 18px;">Configure o nome da instituição, chave Pix de recebimento e contato.</p>
-
-          <form id="academyConfigForm">
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Nome da Academia / Clube</label>
-                <input type="text" class="form-input" id="cfgAcademyName" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">CNPJ (Opcional)</label>
-                <input type="text" class="form-input" id="cfgCnpj">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Chave Pix para Cobrança</label>
-                <input type="text" class="form-input" id="cfgPixKey" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Tipo de Chave Pix</label>
-                <select class="form-select" id="cfgPixType">
-                  <option value="Email">Email</option>
-                  <option value="Telefone">Telefone / Celular</option>
-                  <option value="CNPJ">CNPJ</option>
-                  <option value="Chave Aleatória">Chave Aleatória</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Telefone / WhatsApp Oficial</label>
-                <input type="text" class="form-input" id="cfgPhone">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Endereço dos Treinos</label>
-                <input type="text" class="form-input" id="cfgAddress">
-              </div>
-              <div class="form-group full-width" style="margin-top: 10px;">
-                <button type="submit" class="btn btn-primary" style="align-self: flex-start;">
-                  Salvar Configurações
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
-    </main>
+  <!-- Background Ambient Effects for Desktop View -->
+  <div class="desktop-ambient-bg">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
   </div>
 
-  <!-- ==========================================
-       MODAIS
-       ========================================== -->
+  <!-- Mobile-First App Wrapper -->
+  <main class="app-shell" id="appShell">
 
-  <!-- MODAL 1: Cadastro / Edição de Atleta -->
-  <div class="modal-overlay" id="athleteModal">
-    <div class="modal-card modal-lg">
-      <div class="modal-header">
-        <h3 id="athleteModalTitle">Novo Atleta</h3>
-        <button class="modal-close-btn" data-close-modal="athleteModal" aria-label="Fechar">✕</button>
+    <!-- Top Status / Branding Bar -->
+    <header class="app-top-bar">
+      <div class="top-bar-brand">
+        <div class="brand-logo-frame">
+          <img src="/assets/logo.jpg" alt="Vôlei Academy Olympic VOA" class="brand-mini-logo">
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">VÔLEI ACADEMY</span>
+          <span class="brand-tag"><span class="tag-olympic-badge">OLYMPIC</span> • TREINADOR VITOR</span>
+        </div>
       </div>
-      <form id="athleteForm">
-        <div class="modal-body">
-          <input type="hidden" id="athleteFormId">
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <label class="form-label">Nome Completo do Atleta <span class="req">*</span></label>
-              <input type="text" class="form-input" id="athleteFormName" placeholder="Ex: Gabriel Henrique Duarte" required>
+      <div class="top-bar-actions">
+        <button type="button" class="icon-btn-header" id="btnOpenShareEnrollment" title="Link e QR Code de Auto-Inscrição de Alunos">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+        <button type="button" class="icon-btn-header" id="btnQuickAddAthlete" title="Novo Aluno">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT VIEWS WRAPPER -->
+    <div class="view-container">
+
+      <!-- ========================================================
+           ABA 1: CHAMADA DO TREINO
+           ======================================================== -->
+      <section class="app-view active" id="view-chamada">
+        
+        <!-- Header da Chamada -->
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">CHAMADA</h1>
+            <p class="view-subtitle" id="chamadaDateDisplay">Hoje, 16 de Outubro</p>
+          </div>
+          <div class="live-counter-badge" id="chamadaCounterBadge">
+            <span class="counter-num" id="chamadaPresentCount">0</span>
+            <span class="counter-divider">/</span>
+            <span class="counter-total" id="chamadaTotalCount">0</span>
+            <span class="counter-label">Presentes</span>
+          </div>
+        </div>
+
+        <!-- Seletor de Data Rápido -->
+        <div class="date-navigator-card">
+          <button type="button" class="date-nav-btn" id="btnPrevDate" title="Dia anterior">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          
+          <div class="date-input-wrapper">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <input type="date" id="chamadaDateInput" class="hidden-date-input">
+            <span class="date-pretty-text" id="chamadaDatePretty">Carregando data...</span>
+          </div>
+
+          <button type="button" class="date-nav-btn" id="btnNextDate" title="Próximo dia">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <!-- Filtros de Gênero -->
+        <div class="filter-pills-row" id="chamadaGenderFilters">
+          <button type="button" class="pill-btn active" data-gender="all">Todos</button>
+          <button type="button" class="pill-btn" data-gender="M">Masculino</button>
+          <button type="button" class="pill-btn" data-gender="F">Feminino</button>
+        </div>
+
+        <!-- Filtros de Categoria (Sub-11 a Adulto) -->
+        <div class="filter-scroll-wrapper">
+          <div class="filter-pills-row category-scroll" id="chamadaCategoryFilters">
+            <button type="button" class="pill-btn-cat active" data-category="all">Todas</button>
+            <button type="button" class="pill-btn-cat" data-category="sub11">Sub-11</button>
+            <button type="button" class="pill-btn-cat" data-category="sub13">Sub-13</button>
+            <button type="button" class="pill-btn-cat" data-category="sub15">Sub-15</button>
+            <button type="button" class="pill-btn-cat" data-category="sub17">Sub-17</button>
+            <button type="button" class="pill-btn-cat" data-category="sub19">Sub-19</button>
+            <button type="button" class="pill-btn-cat" data-category="adulto">Adulto</button>
+          </div>
+        </div>
+
+        <!-- Barra de Ação Rápida -->
+        <div class="quick-action-bar">
+          <button type="button" class="btn-action-outline" id="btnToggleAllAttendance">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span id="btnToggleAllLabel">MARCAR TODOS PRESENTES</span>
+          </button>
+        </div>
+
+        <!-- Lista de Alunos para Chamada -->
+        <div class="athletes-call-list" id="chamadaListContainer">
+          <!-- Populado via Javascript -->
+        </div>
+
+        <!-- Botão Fixo de Finalizar Chamada -->
+        <div class="sticky-footer-action">
+          <button type="button" class="btn-submit-chamada" id="btnFinalizarChamada">
+            <span class="btn-text">FINALIZAR CHAMADA</span>
+            <span class="btn-badge" id="btnFinalizarBadge">0 Presentes</span>
+          </button>
+        </div>
+
+      </section>
+
+
+      <!-- ========================================================
+           ABA 2: ATLETAS
+           ======================================================== -->
+      <section class="app-view" id="view-atletas">
+        
+        <!-- Header Atletas -->
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">ATLETAS</h1>
+            <p class="view-subtitle" id="atletasSubtitleCount">10 alunos cadastrados</p>
+          </div>
+          <div class="view-header-actions">
+            <button type="button" class="btn-share-link-header" id="btnShareEnrollmentAtletas" title="Compartilhar Link de Auto-Inscrição">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>Auto-Inscrição</span>
+            </button>
+            <button type="button" class="btn-primary-add" id="btnAddNewAthlete">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              <span>Novo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Busca com Ícone -->
+        <div class="search-input-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="athleteSearchInput" placeholder="Buscar aluno por nome...">
+          <button type="button" class="clear-search-btn" id="btnClearSearch" style="display: none;">✕</button>
+        </div>
+
+        <!-- Filtros de Gênero -->
+        <div class="filter-pills-row" id="atletasGenderFilters">
+          <button type="button" class="pill-btn active" data-gender="all">Todos</button>
+          <button type="button" class="pill-btn" data-gender="M">Masculino</button>
+          <button type="button" class="pill-btn" data-gender="F">Feminino</button>
+        </div>
+
+        <!-- Filtros de Categoria -->
+        <div class="filter-scroll-wrapper">
+          <div class="filter-pills-row category-scroll" id="atletasCategoryFilters">
+            <button type="button" class="pill-btn-cat active" data-category="all">Todas</button>
+            <button type="button" class="pill-btn-cat" data-category="sub11">Sub-11</button>
+            <button type="button" class="pill-btn-cat" data-category="sub13">Sub-13</button>
+            <button type="button" class="pill-btn-cat" data-category="sub15">Sub-15</button>
+            <button type="button" class="pill-btn-cat" data-category="sub17">Sub-17</button>
+            <button type="button" class="pill-btn-cat" data-category="sub19">Sub-19</button>
+            <button type="button" class="pill-btn-cat" data-category="adulto">Adulto</button>
+          </div>
+        </div>
+
+        <!-- Lista de Cards de Atletas -->
+        <div class="athletes-cards-grid" id="atletasCardsContainer">
+          <!-- Populado via Javascript -->
+        </div>
+
+      </section>
+
+
+      <!-- ========================================================
+           ABA 3: MENSALIDADES / FINANCEIRO
+           ======================================================== -->
+      <section class="app-view" id="view-financeiro">
+        
+        <!-- Header Financeiro -->
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">MENSALIDADES</h1>
+            <p class="view-subtitle">Controle de pagamentos dos alunos</p>
+          </div>
+        </div>
+
+        <!-- Seletor de Mês -->
+        <div class="month-selector-card">
+          <button type="button" class="month-nav-btn" id="btnPrevMonth">◀</button>
+          <div class="month-title-wrap">
+            <span class="month-label-small">MÊS DE REFERÊNCIA</span>
+            <span class="month-title-text" id="currentMonthDisplay">Outubro de 2026</span>
+          </div>
+          <button type="button" class="month-nav-btn" id="btnNextMonth">▶</button>
+        </div>
+
+        <!-- Cards de Resumo Financeiro (KPIs) -->
+        <div class="finance-kpis-grid">
+          <div class="kpi-card kpi-received">
+            <span class="kpi-label">RECEBIDO</span>
+            <span class="kpi-value" id="kpiReceivedValue">R$ 0,00</span>
+            <span class="kpi-sub" id="kpiReceivedCount">0 alunos pagos</span>
+          </div>
+          <div class="kpi-card kpi-pending">
+            <span class="kpi-label">PENDENTE</span>
+            <span class="kpi-value" id="kpiPendingValue">R$ 0,00</span>
+            <span class="kpi-sub" id="kpiPendingCount">0 pendentes</span>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso de Arrecadação -->
+        <div class="progress-bar-card">
+          <div class="progress-header">
+            <span>Meta de Arrecadação</span>
+            <span id="kpiProgressPercentage">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="kpiProgressBar" style="width: 0%;"></div>
+          </div>
+          <div class="progress-footer">
+            <span>Total Previsto:</span>
+            <strong id="kpiTotalExpected">R$ 0,00</strong>
+          </div>
+        </div>
+
+        <!-- Filtro de Pagamentos -->
+        <div class="filter-pills-row" id="financeStatusFilters" style="margin-top: 14px;">
+          <button type="button" class="pill-btn active" data-status="all">Todos</button>
+          <button type="button" class="pill-btn" data-status="paid">✓ Pagos</button>
+          <button type="button" class="pill-btn" data-status="pending">✕ Pendentes</button>
+        </div>
+
+        <!-- Lista de Mensalidades -->
+        <div class="finances-list-container" id="financesListContainer">
+          <!-- Populado via Javascript -->
+        </div>
+
+      </section>
+
+
+      <!-- ========================================================
+           ABA 4: PERFIL & CONFIGURAÇÕES
+           ======================================================== -->
+      <section class="app-view" id="view-perfil">
+        
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">PERFIL</h1>
+            <p class="view-subtitle">Treinador & Sistema</p>
+          </div>
+        </div>
+
+        <!-- Card do Treinador com Brasão Oficial VOA -->
+        <div class="profile-card">
+          <div class="profile-emblem-wrap">
+            <div class="profile-emblem-aura"></div>
+            <div class="profile-emblem-frame">
+              <img src="/assets/logo.jpg" alt="Vôlei Academy Olympic VOA" class="profile-logo-emblem">
+            </div>
+          </div>
+          <h2 class="profile-name" id="profileCoachName">Vitor Gabriel</h2>
+          <div class="profile-brand-badges">
+            <span class="badge-academy-gold">VÔLEI ACADEMY OLYMPIC</span>
+            <span class="profile-role-badge" id="profileCoachRole">TREINADOR</span>
+          </div>
+          
+          <div class="profile-info-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span id="profileCoachEmail">voleiacademyolympic@gmail.com</span>
+          </div>
+
+          <div class="profile-info-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span id="profileCoachPhone">(77) 98141-9995</span>
+          </div>
+
+          <div class="profile-info-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span id="profileCoachAcademy">Vôlei Academy Olympic (VOA)</span>
+          </div>
+        </div>
+
+        <!-- Métricas Gerais do Perfil -->
+        <div class="profile-stats-grid">
+          <div class="profile-stat-box">
+            <span class="stat-number" id="profileStatAthletes">10</span>
+            <span class="stat-title">Atletas Ativos</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="stat-number" id="profileStatAttendances">0</span>
+            <span class="stat-title">Chamadas Salvas</span>
+          </div>
+          <div class="profile-stat-box">
+            <span class="stat-number" id="profileStatRate">100%</span>
+            <span class="stat-title">Taxa Média</span>
+          </div>
+        </div>
+
+        <!-- Card de Auto-Inscrição de Alunos no Perfil -->
+        <div class="profile-card" style="margin-top: 14px; background: linear-gradient(135deg, rgba(255,107,0,0.12), rgba(15,20,32,0.95)); border: 1px solid rgba(255,107,0,0.35); border-radius: 14px; padding: 14px 16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:rgba(255,107,0,0.2); border:1px solid rgba(255,107,0,0.4); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:18px;">
+                🏐
+              </div>
+              <div>
+                <h4 style="font-size:13px; font-weight:800; color:#fff; margin:0 0 2px 0;">Auto-Inscrição de Alunos</h4>
+                <p style="font-size:11px; color:var(--text-muted); margin:0;">Link público e QR Code para a quadra</p>
+              </div>
+            </div>
+            <button type="button" class="btn-primary-add" id="btnShareEnrollmentPerfil" style="font-size:12px; padding:6px 12px; white-space:nowrap;">
+              Abrir Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Botão de Ação Sair -->
+        <div style="margin: 22px 0 12px;">
+          <button type="button" class="btn-logout-profile" id="btnLogoutProfile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            <span>SAIR</span>
+          </button>
+        </div>
+
+        <!-- Rodapé do Perfil -->
+        <div class="profile-app-footer">
+          <span>VOA Academy • Versão 2.0 Mobile & Web</span>
+          <p>Treinador Vitor Gabriel • Desenvolvido com carinho para o vôlei</p>
+        </div>
+
+      </section>
+
+      <!-- ========================================================
+           ABA 5: INSCRIÇÃO PÚBLICA DE ATLETAS (AUTO-INSCRIÇÃO)
+           ======================================================== -->
+      <section class="app-view" id="view-inscricao-publica">
+        
+        <!-- Banner Hero Superior -->
+        <div class="public-enrollment-hero">
+          <div class="hero-brand-top">
+            <div class="hero-logo-frame">
+              <img src="/assets/logo.jpg" alt="Vôlei Academy Olympic VOA" class="hero-logo">
+            </div>
+            <span class="hero-tag">INSCRIÇÕES OFICIAIS</span>
+          </div>
+          <h1 class="hero-title">VÔLEI ACADEMY OLYMPIC</h1>
+          <p class="hero-subtitle">Escolinha de Voleibol VOA • Treinador Vitor Gabriel</p>
+          <div class="hero-badges">
+            <span class="hero-pill">🏐 Masculino & Feminino</span>
+            <span class="hero-pill">🏆 Iniciação ao Rendimento</span>
+            <span class="hero-pill">📍 Vitória da Conquista / BA</span>
+          </div>
+        </div>
+
+        <!-- Card do Formulário de Auto-Inscrição -->
+        <div class="public-card-container" id="publicEnrollmentFormContainer">
+          
+          <div class="public-card-header">
+            <h2 class="public-card-title">Ficha de Inscrição do Atleta</h2>
+            <p class="public-card-desc">Preencha seus dados abaixo para se cadastrar na VOA Academy. O Treinador receberá sua inscrição imediatamente!</p>
+          </div>
+
+          <form id="publicEnrollmentForm" class="public-form">
+            <!-- Nome Completo -->
+            <div class="form-group">
+              <label class="form-label" for="pubAthleteName">Nome Completo do Aluno(a) *</label>
+              <input type="text" id="pubAthleteName" class="form-input" placeholder="Ex: Gabriel Silva Santos" required autocomplete="name">
             </div>
 
+            <!-- Gênero -->
             <div class="form-group">
-              <label class="form-label">Apelido / Como gosta de ser chamado</label>
-              <input type="text" class="form-input" id="athleteFormNickname" placeholder="Ex: Biel">
+              <label class="form-label">Naipe / Sexo *</label>
+              <div class="gender-radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="pubAthleteGender" value="M" checked>
+                  <span class="radio-custom"></span>
+                  <span class="radio-text">Masculino</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="pubAthleteGender" value="F">
+                  <span class="radio-custom"></span>
+                  <span class="radio-text">Feminino</span>
+                </label>
+              </div>
             </div>
 
+            <!-- Data de Nascimento -->
             <div class="form-group">
-              <label class="form-label">Data de Nascimento <span class="req">*</span></label>
-              <input type="date" class="form-input" id="athleteFormBirthDate" required>
-              <span class="form-hint" id="athleteAgeFeedback" style="color: #38bdf8; font-weight: 700;"></span>
+              <label class="form-label" for="pubAthleteBirthDate">Data de Nascimento *</label>
+              <input type="date" id="pubAthleteBirthDate" class="form-input" required>
             </div>
 
+            <!-- Card Calculado Dinâmico (Idade e Categoria Oficial CBV) -->
+            <div class="pub-calc-card" id="pubCalcCard">
+              <div class="pub-calc-item">
+                <span class="pub-calc-label">Ano de Nasc.</span>
+                <span class="pub-calc-val" id="pubCalcYear">----</span>
+              </div>
+              <div class="pub-calc-sep"></div>
+              <div class="pub-calc-item">
+                <span class="pub-calc-label">Idade Esportiva</span>
+                <span class="pub-calc-val" id="pubCalcAge">-- anos</span>
+              </div>
+              <div class="pub-calc-sep"></div>
+              <div class="pub-calc-item">
+                <span class="pub-calc-label">Categoria CBV</span>
+                <span class="pub-calc-val highlight" id="pubCalcCat">--</span>
+              </div>
+            </div>
+
+            <!-- Categoria Selecionada / Ajustável -->
+            <div class="form-group" style="margin-top: 10px;">
+              <label class="form-label" for="pubAthleteCategory">Categoria de Treino Pretendida</label>
+              <select id="pubAthleteCategory" class="form-select">
+                <option value="sub13">Sub-13 (Nascidos a partir de 2014)</option>
+                <option value="sub15">Sub-15 (Nascidos em 2012 / 2013)</option>
+                <option value="sub17">Sub-17 (Nascidos em 2010 / 2011)</option>
+                <option value="sub19">Sub-19 (Nascidos em 2008 / 2009)</option>
+                <option value="adulto">Adulto (Nascidos até 2007)</option>
+              </select>
+              <small class="form-hint">A categoria é calculada automaticamente conforme seu ano de nascimento.</small>
+            </div>
+
+            <!-- Posição Preferida -->
             <div class="form-group">
-              <label class="form-label">Gênero <span class="req">*</span></label>
-              <select class="form-select" id="athleteFormGender" required>
+              <label class="form-label" for="pubAthletePosition">Posição Preferida no Vôlei</label>
+              <select id="pubAthletePosition" class="form-select">
+                <option value="Ponteiro">Ponteiro (Entrada de Rede)</option>
+                <option value="Levantador">Levantador</option>
+                <option value="Central">Central (Meio de Rede)</option>
+                <option value="Oposto">Oposto (Saída de Rede)</option>
+                <option value="Líbero">Líbero (Especialista em Defesa)</option>
+                <option value="Iniciante">Iniciante / Em Definição</option>
+              </select>
+            </div>
+
+            <!-- WhatsApp / Telefone -->
+            <div class="form-group">
+              <label class="form-label" for="pubAthletePhone">WhatsApp para Contato *</label>
+              <input type="tel" id="pubAthletePhone" class="form-input" placeholder="(77) 99999-9999" required autocomplete="tel">
+              <small class="form-hint">Número com DDD para receber avisos de treinos e jogos.</small>
+            </div>
+
+            <!-- Nome do Responsável (se menor) -->
+            <div class="form-group">
+              <label class="form-label" for="pubAthleteResponsible">Nome do Responsável Legal (se menor de 18 anos)</label>
+              <input type="text" id="pubAthleteResponsible" class="form-input" placeholder="Ex: Nome da mãe, pai ou responsável">
+            </div>
+
+            <!-- Observações ou Restrição Médica -->
+            <div class="form-group">
+              <label class="form-label" for="pubAthleteNotes">Histórico ou Restrição Médica (opcional)</label>
+              <textarea id="pubAthleteNotes" class="form-input form-textarea" rows="2" placeholder="Ex: Já treinou voleibol antes; Possui asma; Alergia a remédio..."></textarea>
+            </div>
+
+            <div class="pub-terms-notice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Ao cadastrar, seus dados são enviados com segurança para o Treinador Vitor Gabriel da VOA Academy!</span>
+            </div>
+
+            <!-- Botão de Finalização -->
+            <div style="margin-top: 20px;">
+              <button type="submit" class="btn-pub-submit" id="btnSubmitPublicEnrollment">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>CONCLUIR MINHA INSCRIÇÃO 🏐</span>
+              </button>
+            </div>
+          </form>
+
+        </div>
+
+        <!-- Card de Sucesso após Envio (Invisível no início) -->
+        <div class="public-card-container public-success-container" id="publicSuccessCard" style="display: none;">
+          <div class="success-badge-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          
+          <h2 class="success-title">🎉 Inscrição Realizada com Sucesso!</h2>
+          <p class="success-subtitle">Seja muito bem-vindo(a) à família <strong style="color:var(--primary);">VOA Academy</strong>!</p>
+          
+          <!-- Resumo dos dados cadastrados -->
+          <div class="success-athlete-summary" id="publicSuccessSummary">
+            <!-- Populado via JS -->
+          </div>
+
+          <div class="success-instructions">
+            <p>Seus dados já foram registrados no sistema. Para agilizar o seu início, confirme sua inscrição diretamente no WhatsApp do Treinador Vitor Gabriel:</p>
+          </div>
+
+          <!-- Botão WhatsApp com mensagem pré-formatada -->
+          <a id="btnPublicWhatsAppConfirm" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-confirm">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>CONFIRMAR NO WHATSAPP COM O TREINADOR</span>
+          </a>
+
+          <!-- Botão de Nova Inscrição -->
+          <button type="button" class="btn-pub-reset" id="btnResetPublicEnrollment">
+            Fazer Outra Inscrição
+          </button>
+
+        </div>
+
+        <!-- Rodapé do Aluno com link de retorno ao Painel -->
+        <div class="pub-footer-wrap">
+          <span>VOA Academy • Treinador Vitor Gabriel</span>
+          <p>Dúvidas? Entre em contato pelo WhatsApp (77) 98141-9995</p>
+          <button type="button" class="btn-return-admin" id="btnReturnToAdmin">
+            Acessar Painel do Treinador ⚙️
+          </button>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ========================================================
+         BOTTOM NAVIGATION BAR (4 ABAS PRINCIPAIS)
+         ======================================================== -->
+    <nav class="app-bottom-nav">
+      
+      <button type="button" class="nav-tab-btn active" data-target="view-chamada">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+        </div>
+        <span class="tab-label">Chamada</span>
+      </button>
+
+      <button type="button" class="nav-tab-btn" data-target="view-atletas">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <span class="tab-label">Atletas</span>
+      </button>
+
+      <button type="button" class="nav-tab-btn" data-target="view-financeiro">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <span class="tab-label">Financeiro</span>
+      </button>
+
+      <button type="button" class="nav-tab-btn" data-target="view-perfil">
+        <div class="tab-icon-wrap">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+        </div>
+        <span class="tab-label">Perfil</span>
+      </button>
+
+    </nav>
+
+  </main>
+
+
+  <!-- ========================================================
+       MODAL: ADICIONAR / EDITAR ATLETA
+       ======================================================== -->
+  <div class="modal-backdrop" id="athleteModal">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+      
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-header-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h2 class="modal-title" id="modalAthleteTitle">Novo Aluno</h2>
+            <span class="modal-subtitle">Ficha cadastral e turmas de treino</span>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseAthleteModal" aria-label="Fechar modal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="athleteForm" class="modal-form">
+        <input type="hidden" id="formAthleteId" value="">
+
+        <!-- Nome Completo do Aluno -->
+        <div class="form-group">
+          <label class="form-label" for="formName">Nome Completo do Aluno <span class="req-star">*</span></label>
+          <div class="input-with-icon">
+            <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="formName" class="form-input has-icon" placeholder="Ex: Lucas Gabriel da Silva" required autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Data de Nascimento & Gênero -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="formBirthDate">Data de Nascimento <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <input type="date" id="formBirthDate" class="form-input has-icon" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formGender">Gênero <span class="req-star">*</span></label>
+            <div class="select-wrap">
+              <select id="formGender" class="form-select" required>
                 <option value="M">Masculino</option>
                 <option value="F">Feminino</option>
               </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Turma de Treino Principal <span class="req">*</span></label>
-              <select class="form-select" id="athleteFormGroup" required>
-                <option value="pequenos">👶 Turma Pequenos (6 a 14 anos • Treinos: Ter/Qui/Sáb)</option>
-                <option value="grandes">🏆 Turma Grandes (14+ anos • Treinos: Seg/Qui/Sáb)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Categoria Oficial (Torneios) <span class="req">*</span></label>
-              <select class="form-select" id="athleteFormCategory" required>
-                <option value="sub11_m">Sub-11 Masculino (até 11 anos)</option>
-                <option value="sub11_f">Sub-11 Feminino (até 11 anos)</option>
-                <option value="sub13_m">Sub-13 Masculino (12 a 13 anos)</option>
-                <option value="sub13_f">Sub-13 Feminino (12 a 13 anos)</option>
-                <option value="sub16_m">Sub-16 Masculino (14 a 16 anos)</option>
-                <option value="sub16_f">Sub-16 Feminino (14 a 16 anos)</option>
-                <option value="sub18_m">Sub-18 Masculino (17 a 18 anos)</option>
-                <option value="sub18_f">Sub-18 Feminino (17 a 18 anos)</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width" style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.35); padding: 12px 14px; border-radius: var(--radius-md);">
-              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 700; color: #fbbf24; font-size: 0.88rem;">
-                <input type="checkbox" id="athleteFormPlaysUp" style="width: 18px; height: 18px; accent-color: #f59e0b; cursor: pointer;">
-                <span>⚡ Exceção: Atleta é dos Pequenos mas joga / treina também no Grande</span>
-              </label>
-              <p style="font-size: 0.74rem; color: var(--text-dim); margin-top: 4px; margin-left: 28px;">
-                Quando marcado, este atleta será convocado e aparecerá automaticamente na lista de presença dos treinos dos Grandes (Segunda, Quinta e Sábado).
-              </p>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Nome do Responsável (Pai/Mãe/Tutor)</label>
-              <input type="text" class="form-input" id="athleteFormGuardian" placeholder="Ex: Marcelo Duarte (Pai)">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">WhatsApp do Responsável</label>
-              <input type="text" class="form-input" id="athleteFormGuardianPhone" placeholder="Ex: 11998765432">
-              <span class="form-hint">Usado para lembretes e avisos rápidos com 1 clique</span>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Telefone do Atleta (Se houver)</label>
-              <input type="text" class="form-input" id="athleteFormAthletePhone" placeholder="Ex: 11987654321">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Posição / Especialidade</label>
-              <input type="text" class="form-input" id="athleteFormPosition" placeholder="Ex: Goleiro, Meio-Campo, Atacante">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Valor da Mensalidade (R$) <span class="req">*</span></label>
-              <input type="number" step="0.01" class="form-input" id="athleteFormFee" value="140" required>
-              <span class="form-hint">Coloque 0 se for Atleta Bolsista</span>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Dia do Vencimento <span class="req">*</span></label>
-              <select class="form-select" id="athleteFormDueDay" required>
-                <option value="5">Dia 05</option>
-                <option value="10" selected>Dia 10</option>
-                <option value="15">Dia 15</option>
-                <option value="20">Dia 20</option>
-                <option value="25">Dia 25</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Status do Aluno</label>
-              <select class="form-select" id="athleteFormStatus">
-                <option value="ativo">Ativo</option>
-                <option value="inativo">Inativo / Trancado</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <label class="form-label">Observações Médicas / Restrições / Alergias</label>
-              <textarea class="form-textarea" id="athleteFormNotes" placeholder="Informações relevantes sobre saúde, remédios ou restrições..."></textarea>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close-modal="athleteModal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Atleta</button>
+
+        <!-- Card de Cálculo Automático Inteligente (CBV / Federação) -->
+        <div class="athlete-calc-card" id="athleteCalcCard">
+          <div class="calc-card-header">
+            <div class="calc-header-badge">
+              <span class="calc-pulse-dot"></span>
+              <span class="calc-card-tag">PADRÃO OFICIAL CBV</span>
+            </div>
+            <span class="form-hint-badge" id="formYearHint" style="display: none;">Por Ano</span>
+          </div>
+          <div class="calc-card-grid">
+            <div class="calc-grid-item">
+              <span class="calc-item-label">Ano Nasc.</span>
+              <strong class="calc-item-val" id="calcYearVal">----</strong>
+            </div>
+            <div class="calc-grid-divider"></div>
+            <div class="calc-grid-item">
+              <span class="calc-item-label">Idade Esportiva</span>
+              <strong class="calc-item-val highlight" id="calcAgeVal">-- anos</strong>
+            </div>
+            <div class="calc-grid-divider"></div>
+            <div class="calc-grid-item">
+              <span class="calc-item-label">Categoria Oficial</span>
+              <strong class="calc-item-val cat-badge-accent" id="calcCatVal">--</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categoria Principal e Posição em Quadra -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="formCategory">Categoria Principal</label>
+            <div class="select-wrap">
+              <select id="formCategory" class="form-select" required>
+                <option value="sub11">Sub-11</option>
+                <option value="sub13">Sub-13</option>
+                <option value="sub15" selected>Sub-15</option>
+                <option value="sub17">Sub-17</option>
+                <option value="sub19">Sub-19</option>
+                <option value="adulto">Adulto</option>
+              </select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formPosition">Posição em Quadra</label>
+            <div class="select-wrap">
+              <select id="formPosition" class="form-select">
+                <option value="Iniciante / Geral">Iniciante / Geral</option>
+                <option value="Levantador">Levantador(a)</option>
+                <option value="Ponteiro">Ponteiro(a)</option>
+                <option value="Central">Central</option>
+                <option value="Oposto">Oposto(a)</option>
+                <option value="Líbero">Líbero</option>
+              </select>
+              <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categorias em que o Aluno Pode Jogar (Multi-Seleção Livre) -->
+        <div class="form-group">
+          <div class="form-label-row">
+            <label class="form-label">Turmas & Categorias de Atuação <span class="req-star">*</span></label>
+            <span class="form-hint-badge">Multi-turmas</span>
+          </div>
+          <span class="form-sub-hint">Selecione as categorias onde o atleta treina ou joga competições:</span>
+          <div class="category-multiselect-grid" id="formCategoriesPills">
+            <!-- Gerado dinamicamente via JS -->
+          </div>
+        </div>
+
+        <!-- Telefone & Mensalidade -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="formPhone">WhatsApp / Telefone</label>
+            <div class="input-with-icon">
+              <svg class="field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <input type="tel" id="formPhone" class="form-input has-icon" placeholder="(77) 98141-9995" maxlength="15">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="formMonthlyFee">Mensalidade</label>
+            <div class="currency-input-wrap">
+              <span class="currency-prefix">R$</span>
+              <input type="number" id="formMonthlyFee" class="form-input is-currency" placeholder="150" value="150" min="0" step="10">
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Avaliação Técnica Inicial (Campos para colocar os dados) -->
+        <div class="form-expandable-section" id="formEvalSection">
+          <div class="expandable-header" id="btnToggleFormEval" type="button">
+            <div class="expandable-title-wrap">
+              <span class="expandable-icon">⭐</span>
+              <div>
+                <span class="expandable-title">Avaliação Técnica de Fundamentos</span>
+                <span class="expandable-subtitle">Notas de 1 a 10 (Saque, Manchete, Toque, Ataque...)</span>
+              </div>
+            </div>
+            <span class="expandable-badge" id="formEvalBadge">Preencher ▾</span>
+          </div>
+          <div class="expandable-content" id="formEvalContent" style="display: none;">
+            <div class="form-skills-inputs-grid">
+              <div class="form-skill-input-item">
+                <label class="skill-field-label">🏐 Saque</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_saque" class="form-input skill-field-input" placeholder="Ex: 8.0">
+              </div>
+              <div class="form-skill-input-item">
+                <label class="skill-field-label">🤲 Toque</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_toque" class="form-input skill-field-input" placeholder="Ex: 8.0">
+              </div>
+              <div class="form-skill-input-item">
+                <label class="skill-field-label">🛡️ Manchete</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_manchete" class="form-input skill-field-input" placeholder="Ex: 8.5">
+              </div>
+              <div class="form-skill-input-item">
+                <label class="skill-field-label">🎯 Precisão Ataque</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_precisaoAtaque" class="form-input skill-field-input" placeholder="Ex: 7.5">
+              </div>
+              <div class="form-skill-input-item">
+                <label class="skill-field-label">💥 Acerto Ataque</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_acertoAtaque" class="form-input skill-field-input" placeholder="Ex: 8.0">
+              </div>
+              <div class="form-skill-input-item">
+                <label class="skill-field-label">🧭 Posicionamento</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_posicionamento" class="form-input skill-field-input" placeholder="Ex: 8.5">
+              </div>
+              <div class="form-skill-input-item" style="grid-column: span 2;">
+                <label class="skill-field-label">⚡ Volume de Jogo</label>
+                <input type="number" min="1" max="10" step="0.5" id="formSkill_volumeJogo" class="form-input skill-field-input" placeholder="Ex: 9.0">
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 8px;">
+              <label class="form-label" for="formSkill_notes">Observações do Treinador</label>
+              <input type="text" id="formSkill_notes" class="form-input" placeholder="Ex: Ótima postura defensiva e saque veloz.">
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões do Rodapé -->
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-cancel" id="btnCancelAthleteModal">Cancelar</button>
+          <button type="submit" class="btn-save-athlete" id="btnSaveAthlete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Salvar Atleta</span>
+          </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 2: Ficha / Detalhes do Atleta -->
-  <div class="modal-overlay" id="athleteDetailsModal">
-    <div class="modal-card modal-lg">
+
+  <!-- ========================================================
+       MODAL: DETALHES DO ATLETA (BOTTOM SHEET)
+       ======================================================== -->
+  <div class="modal-backdrop" id="athleteDetailModal">
+    <div class="modal-sheet">
+      <div class="modal-drag-indicator"></div>
+
       <div class="modal-header">
-        <h3>Ficha Completa do Atleta</h3>
-        <button class="modal-close-btn" data-close-modal="athleteDetailsModal" aria-label="Fechar">✕</button>
+        <h2 class="modal-title">Ficha do Atleta</h2>
+        <button type="button" class="modal-close-btn" id="btnCloseDetailModal">✕</button>
       </div>
-      <div class="modal-body" id="athleteDetailsContent">
-        <!-- Dynamically populated -->
+
+      <div class="athlete-detail-body" id="athleteDetailContent">
+        <!-- Populado dinamicamente -->
       </div>
-      <div class="modal-footer" style="justify-content: space-between;">
-        <button type="button" class="btn btn-danger btn-sm" id="btnDeleteAthlete">Excluir Cadastro</button>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="btn btn-secondary" data-close-modal="athleteDetailsModal">Fechar</button>
-          <button type="button" class="btn btn-primary" id="btnEditAthleteDetail">Editar Dados</button>
+
+      <div class="modal-actions-footer space-between">
+        <button type="button" class="btn-delete-athlete" id="btnDeleteCurrentAthlete">Excluir Aluno</button>
+        <div class="actions-right">
+          <button type="button" class="btn-cancel" id="btnCloseDetailModalBtn">Fechar</button>
+          <button type="button" class="btn-edit-athlete" id="btnEditCurrentAthlete">Editar</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: Agendar Treino -->
-  <div class="modal-overlay" id="trainingModal">
-    <div class="modal-card">
+  <!-- ========================================================
+       MODAL: AVALIAÇÃO TÉCNICA DE FUNDAMENTOS (SCOUTING)
+       ======================================================== -->
+  <div class="modal-backdrop" id="athleteEvaluationModal">
+    <div class="modal-sheet modal-sheet-lg">
+      <div class="modal-drag-indicator"></div>
+
       <div class="modal-header">
-        <h3 id="trainingModalTitle">Agendar Novo Treino</h3>
-        <button class="modal-close-btn" data-close-modal="trainingModal" aria-label="Fechar">✕</button>
-      </div>
-      <form id="trainingForm">
-        <div class="modal-body">
-          <input type="hidden" id="trainingFormId">
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <label class="form-label">Turma Convocada <span class="req">*</span></label>
-              <select class="form-select" id="trainingFormGroup" required>
-                <option value="pequenos">👶 Turma Pequenos (6 a 14 anos • Dias oficiais: Terça, Quinta e Sábado)</option>
-                <option value="grandes">🏆 Turma Grandes (14+ anos • Dias oficiais: Segunda, Quinta e Sábado - inclui atletas de exceção)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Data do Treino <span class="req">*</span></label>
-              <input type="date" class="form-input" id="trainingFormDate" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Horário Início <span class="req">*</span></label>
-              <input type="time" class="form-input" id="trainingFormStartTime" value="16:00" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Horário Término <span class="req">*</span></label>
-              <input type="time" class="form-input" id="trainingFormEndTime" value="17:30" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Local / Quadra</label>
-              <input type="text" class="form-input" id="trainingFormLocation" value="Quadra Principal VOA" placeholder="Ex: Quadra 1, Arena VOA">
-            </div>
-
-            <div class="form-group full-width">
-              <label class="form-label">Treinador(a) Responsável</label>
-              <input type="text" class="form-input" id="trainingFormCoach" value="Prof. Carlos Eduardo">
-            </div>
-
-            <div class="form-group full-width">
-              <label class="form-label">Foco do Treino / Tema Técnico</label>
-              <input type="text" class="form-input" id="trainingFormFocus" placeholder="Ex: Fundamentos de Passe, Finalização e Coletivo">
-            </div>
+        <div class="modal-header-info">
+          <div class="modal-header-icon eval-header-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <h2 class="modal-title">Avaliação Técnica</h2>
+            <span class="modal-subtitle" id="evalAthleteSubtitle">Scout de fundamentos do atleta</span>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close-modal="trainingModal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Treino</button>
+        <button type="button" class="modal-close-btn" id="btnCloseEvalModal" aria-label="Fechar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="athleteEvaluationForm" class="modal-form">
+        <input type="hidden" id="evalAthleteId" value="">
+
+        <!-- Placar Geral da Avaliação (Live Score) -->
+        <div class="eval-overall-card">
+          <div class="eval-score-ring">
+            <span class="eval-score-big" id="evalOverallScore">8.0</span>
+            <span class="eval-score-max">/10</span>
+          </div>
+          <div class="eval-overall-info">
+            <div class="eval-level-badge" id="evalLevelBadge">Avançado</div>
+            <span class="eval-overall-title" id="evalAthleteNameHeader">Nome do Aluno</span>
+            <span class="eval-overall-sub">Média dos 7 fundamentos de voleibol</span>
+          </div>
+        </div>
+
+        <!-- Gráfico Visual de Radar dos Dados (Scouting Heptagonal) -->
+        <div class="eval-radar-wrapper" id="evalRadarWrapper">
+          <!-- Gerado dinamicamente via JS com SVG -->
+        </div>
+
+        <!-- Grade dos 7 Fundamentos (Saque, Toque, Manchete, Ataque, etc.) -->
+        <div class="eval-skills-container" id="evalSkillsContainer">
+          <!-- Gerado dinamicamente via JS com sliders 1 a 10 e feedback em tempo real -->
+        </div>
+
+        <!-- Observações do Treinador -->
+        <div class="form-group" style="margin-top: 6px;">
+          <label class="form-label" for="evalNotes">Observações do Treinador / Metas de Treino</label>
+          <textarea id="evalNotes" class="form-input form-textarea" rows="2" placeholder="Ex: Bom saque e postura em quadra. Trabalhar deslocamento rápido na manchete..."></textarea>
+        </div>
+
+        <!-- Data da Avaliação -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="evalDate">Data da Avaliação</label>
+            <input type="date" id="evalDate" class="form-input" required>
+          </div>
+          <div class="form-group" style="justify-content: center;">
+            <span class="eval-scale-hint">⭐ Notas de 1 a 10 (Padrão CBV / Scout)</span>
+          </div>
+        </div>
+
+        <!-- Rodapé com Ações -->
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-cancel" id="btnCancelEvalModal">Cancelar</button>
+          <button type="submit" class="btn-save-athlete" id="btnSaveEvaluation">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Salvar Avaliação</span>
+          </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL 4: Chamada Interativa de Presença -->
-  <div class="modal-overlay" id="attendanceModal">
-    <div class="modal-card modal-lg">
+  <!-- ========================================================
+       MODAL DE COMPARTILHAMENTO DE INSCRIÇÃO & QR CODE
+       ======================================================== -->
+  <div class="modal-backdrop" id="shareEnrollmentModal">
+    <div class="modal-card modal-share-enrollment">
+      
+      <!-- Cabeçalho -->
       <div class="modal-header">
-        <div>
-          <h3 id="checkinModalTitle">Chamada de Treino</h3>
-          <p id="checkinModalSubtitle" style="font-size: 0.8rem; color: var(--text-muted);"></p>
-        </div>
-        <button class="modal-close-btn" data-close-modal="attendanceModal" aria-label="Fechar">✕</button>
-      </div>
-      <div class="modal-body">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-          <div id="attendanceLiveCount" style="font-size: 0.85rem;">
-            <!-- Live counters -->
+        <div class="modal-title-wrap">
+          <div class="share-modal-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           </div>
-          <button type="button" class="btn btn-secondary btn-sm" id="btnMarkAllPresent">
-            ✓ Marcar Todos como Presentes
+          <div>
+            <h3 class="modal-title">Auto-Inscrição de Alunos</h3>
+            <span class="modal-subtitle">Link direto e QR Code para a quadra</span>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btnCloseShareModal" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="modal-body-scrollable">
+        <p class="share-helper-text">
+          Envie o link para novos alunos ou responsáveis preencherem seus dados pelo celular, ou imprima o cartaz oficial com QR Code para fixar na quadra de treino!
+        </p>
+
+        <!-- Campo com o Link Copiável -->
+        <div class="share-link-group">
+          <label class="form-label" for="shareEnrollmentLinkInput">Link Direto de Inscrição:</label>
+          <div class="share-input-row">
+            <input type="text" id="shareEnrollmentLinkInput" class="form-input share-url-input" readonly>
+            <button type="button" class="btn-copy-url" id="btnCopyEnrollmentLink" title="Copiar link para a área de transferência">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botões de Ação Imediata -->
+        <div class="share-quick-actions">
+          <a id="btnShareWhatsAppDirect" href="#" target="_blank" rel="noopener noreferrer" class="btn-share-wa">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>Enviar Convite no WhatsApp</span>
+          </a>
+          <button type="button" class="btn-test-preview" id="btnPreviewPublicEnrollment">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Testar Tela do Aluno</span>
           </button>
         </div>
 
-        <div class="attendance-checklist" id="attendanceChecklist">
-          <!-- Dynamically populated -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-close-modal="attendanceModal">Fechar sem Salvar</button>
-        <button type="button" class="btn btn-success" id="btnSaveAttendance">Salvar Presença</button>
-      </div>
-    </div>
-  </div>
+        <!-- Card de QR Code para Quadra -->
+        <div class="qr-code-showcase" id="qrCodePrintSection">
+          <div class="qr-code-frame">
+            <div class="qr-brand-badge">
+              <div class="qr-logo-frame">
+                <img src="/assets/logo.jpg" alt="Vôlei Academy Olympic VOA" class="qr-logo-img">
+              </div>
+              <span class="qr-academy">VÔLEI ACADEMY</span>
+              <span class="qr-tag">OLYMPIC • VOA</span>
+            </div>
+            
+            <div class="qr-img-wrapper">
+              <img id="enrollmentQrImg" src="" alt="QR Code de Inscrição VOA Academy" class="qr-image" />
+            </div>
 
-  <!-- MODAL 5: Registrar Pagamento de Mensalidade -->
-  <div class="modal-overlay" id="recordPaymentModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Dar Baixa na Mensalidade</h3>
-        <button class="modal-close-btn" data-close-modal="recordPaymentModal" aria-label="Fechar">✕</button>
-      </div>
-      <form id="recordPaymentForm">
-        <div class="modal-body">
-          <div style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: 18px; font-size: 0.88rem;">
-            <div style="font-weight: 800; font-size: 1.05rem;" id="payModalAthleteName">-</div>
-            <div style="color: var(--text-muted); margin-top: 4px;">
-              Mês de Referência: <strong id="payModalRefMonth" style="color: #38bdf8;">-</strong> • Vencimento: <span id="payModalDueDate">-</span>
+            <div class="qr-caption">
+              <strong>Aponte a câmera do celular</strong>
+              <span>e faça sua inscrição na hora!</span>
+            </div>
+            
+            <div class="qr-contact-footer">
+              <span>🏐 Treinador Vitor Gabriel • (77) 98141-9995</span>
             </div>
           </div>
 
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label">Valor Pago (R$) <span class="req">*</span></label>
-              <input type="number" step="0.01" class="form-input" id="payModalAmount" required>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Data do Pagamento <span class="req">*</span></label>
-              <input type="date" class="form-input" id="payModalDate" required>
-            </div>
-
-            <div class="form-group full-width">
-              <label class="form-label">Forma de Pagamento <span class="req">*</span></label>
-              <select class="form-select" id="payModalMethod" required>
-                <option value="Pix">Pix</option>
-                <option value="Dinheiro">Dinheiro em Espécie</option>
-                <option value="Cartão de Débito">Cartão de Débito</option>
-                <option value="Cartão de Crédito">Cartão de Crédito</option>
-                <option value="Transferência Bancária">Transferência / TED</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <label class="form-label">Observações / Comprovante</label>
-              <input type="text" class="form-input" id="payModalNotes" placeholder="Ex: Comprovante enviado via WhatsApp pelo pai">
-            </div>
+          <div style="margin-top: 12px; width: 100%;">
+            <button type="button" class="btn-print-poster" id="btnPrintEnrollmentPoster">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <span>Imprimir Cartaz com QR Code para a Quadra</span>
+            </button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close-modal="recordPaymentModal">Cancelar</button>
-          <button type="submit" class="btn btn-success">Confirmar Pagamento</button>
-        </div>
-      </form>
+
+      </div>
+
+      <!-- Rodapé -->
+      <div class="modal-actions-footer">
+        <button type="button" class="btn-cancel" id="btnCancelShareModal" style="grid-column: 1 / -1;">Fechar</button>
+      </div>
+
     </div>
   </div>
 
-  <!-- MODAL 6: Recibo de Pagamento -->
-  <div class="modal-overlay" id="receiptModal">
-    <div class="modal-card modal-lg">
-      <div class="modal-header">
-        <h3>Recibo Oficial VOA Sports</h3>
-        <button class="modal-close-btn" data-close-modal="receiptModal" aria-label="Fechar">✕</button>
-      </div>
-      <div class="modal-body" id="receiptPrintableContent" style="padding: 10px;">
-        <!-- Dynamically populated -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-close-modal="receiptModal">Fechar</button>
-        <button type="button" class="btn btn-primary" id="btnPrintReceiptAction">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
-          Imprimir / Salvar PDF
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-wrapper" id="toastContainer"></div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- Main Application Script -->
+  <!-- SCRIPT PRINCIPAL -->
   <script type="module" src="/js/app.js"></script>
 </body>
 </html>

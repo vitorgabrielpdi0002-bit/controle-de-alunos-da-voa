@@ -1,1009 +1,658 @@
 /**
- * VOA Sports - Sistema de Gestão de Atletas, Frequência e Mensalidades
- * Módulo de Dados e Armazenamento (LocalStorage)
+ * VOA Vôlei - Camada de Dados e Armazenamento (LocalStorage)
+ * Gerencia Atletas, Chamadas, Mensalidades e Perfil
  */
 
-// 2 Turmas Principais de Treino da VOA
-export const GROUPS = [
+const STORAGE_KEY_ATHLETES = 'voa_volei_athletes_v2';
+const STORAGE_KEY_ATTENDANCE = 'voa_volei_attendance_v2';
+const STORAGE_KEY_FINANCES = 'voa_volei_finances_v2';
+const STORAGE_KEY_PROFILE = 'voa_volei_profile_v2';
+
+// Categorias Oficiais
+export const CATEGORIES = [
+  { id: 'sub11', name: 'Sub-11', label: 'Sub-11 (Até 11 anos)', minAge: 6, maxAge: 11, color: '#06b6d4' },
+  { id: 'sub13', name: 'Sub-13', label: 'Sub-13 (12-13 anos)', minAge: 12, maxAge: 13, color: '#3b82f6' },
+  { id: 'sub15', name: 'Sub-15', label: 'Sub-15 (14-15 anos)', minAge: 14, maxAge: 15, color: '#f59e0b' },
+  { id: 'sub17', name: 'Sub-17', label: 'Sub-17 (16-17 anos)', minAge: 16, maxAge: 17, color: '#10b981' },
+  { id: 'sub19', name: 'Sub-19', label: 'Sub-19 (18-19 anos)', minAge: 18, maxAge: 19, color: '#8b5cf6' },
+  { id: 'adulto', name: 'Adulto', label: 'Adulto (20+ anos)', minAge: 20, maxAge: 99, color: '#ec4899' }
+];
+
+export const POSITIONS = [
+  'Levantador',
+  'Ponteiro',
+  'Central',
+  'Oposto',
+  'Líbero',
+  'Iniciante / Geral'
+];
+
+// Fundamentos Oficiais de Voleibol para Avaliação Técnica (Scouting)
+export const EVALUATION_SKILLS = [
+  { id: 'saque', name: 'Saque', icon: '🏐', desc: 'Potência, direcionamento e consistência no saque' },
+  { id: 'toque', name: 'Toque', icon: '🤲', desc: 'Postura de mãos, precisão e levantamento' },
+  { id: 'manchete', name: 'Manchete', icon: '🛡️', desc: 'Passe, recepção de saque e defesa baixa' },
+  { id: 'precisaoAtaque', name: 'Precisão de Ataque', icon: '🎯', desc: 'Visão de quadra, diagonais e paralelas' },
+  { id: 'acertoAtaque', name: 'Acerto de Ataque', icon: '💥', desc: 'Finalização de jogadas, potência e pontuação' },
+  { id: 'posicionamento', name: 'Posicionamento', icon: '🧭', desc: 'Leitura tática, cobertura e recomposição' },
+  { id: 'volumeJogo', name: 'Volume de Jogo', icon: '⚡', desc: 'Raça, velocidade e recuperação de bolas' }
+];
+
+// Dados iniciais realistas para o app já vir pronto para uso
+const INITIAL_ATHLETES = [
   {
-    id: 'pequenos',
-    name: 'Turma Pequenos',
-    code: 'Pequenos (6 a 14 anos)',
-    shortCode: 'Pequenos',
-    ageRange: '6 a 14 anos',
-    minAge: 6,
-    maxAge: 14,
-    days: ['Terça-feira', 'Quinta-feira', 'Sábado'],
-    daysShort: 'Ter / Qui / Sáb',
-    color: '#06b6d4',
-    bg: 'rgba(6, 182, 212, 0.15)'
+    id: 'at_1',
+    name: 'Gabriel Souza',
+    birthDate: '2011-04-12',
+    gender: 'M',
+    category: 'sub15',
+    categories: ['sub15', 'sub17'], // Joga na sua categoria (Sub-15) e acima (Sub-17)
+    position: 'Levantador',
+    phone: '11987654321',
+    monthlyFee: 150,
+    active: true,
+    createdAt: '2026-01-10',
+    evaluation: {
+      saque: 8.0,
+      toque: 9.5,
+      manchete: 8.0,
+      precisaoAtaque: 7.0,
+      acertoAtaque: 6.5,
+      posicionamento: 9.0,
+      volumeJogo: 8.5,
+      notes: 'Excelente visão tática e distribuição veloz pelo meio.',
+      updatedAt: '2026-10-10'
+    },
+    evaluationHistory: [
+      {
+        id: 'eval_gabriel_1',
+        date: '2026-08-15',
+        average: 7.2,
+        notes: 'Início dos treinamentos de levantamento e passe.',
+        skills: { saque: 7.0, toque: 8.0, manchete: 7.0, precisaoAtaque: 6.5, acertoAtaque: 6.0, posicionamento: 8.0, volumeJogo: 7.5 }
+      },
+      {
+        id: 'eval_gabriel_2',
+        date: '2026-09-18',
+        average: 7.7,
+        notes: 'Evolução consistente na postura de mãos e defesa.',
+        skills: { saque: 7.5, toque: 9.0, manchete: 7.5, precisaoAtaque: 7.0, acertoAtaque: 6.0, posicionamento: 8.5, volumeJogo: 8.0 }
+      },
+      {
+        id: 'eval_gabriel_3',
+        date: '2026-10-10',
+        average: 8.1,
+        notes: 'Excelente visão tática e distribuição veloz pelo meio.',
+        skills: { saque: 8.0, toque: 9.5, manchete: 8.0, precisaoAtaque: 7.0, acertoAtaque: 6.5, posicionamento: 9.0, volumeJogo: 8.5 }
+      }
+    ]
   },
   {
-    id: 'grandes',
-    name: 'Turma Grandes',
-    code: 'Grandes (14+ anos)',
-    shortCode: 'Grandes',
-    ageRange: '14 anos acima',
-    minAge: 14,
-    maxAge: 99,
-    days: ['Segunda-feira', 'Quinta-feira', 'Sábado'],
-    daysShort: 'Seg / Qui / Sáb',
-    color: '#f59e0b',
-    bg: 'rgba(245, 158, 11, 0.15)'
-  }
-];
-
-export function getGroupById(id) {
-  return GROUPS.find(g => g.id === id) || GROUPS[0];
-}
-
-export function suggestGroup(birthDateString) {
-  const age = calculateAge(birthDateString);
-  if (age === null) return 'pequenos';
-  return age >= 14 ? 'grandes' : 'pequenos';
-}
-
-// Categorias Oficiais por Faixa Etária e Gênero (Torneios / Federação)
-export const CATEGORIES = [
-  { id: 'sub11_m', name: 'Sub-11 Masculino', code: 'Sub-11 M', minAge: 6, maxAge: 11, gender: 'M', defaultGroup: 'pequenos', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)' },
-  { id: 'sub11_f', name: 'Sub-11 Feminino', code: 'Sub-11 F', minAge: 6, maxAge: 11, gender: 'F', defaultGroup: 'pequenos', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)' },
-  { id: 'sub13_m', name: 'Sub-13 Masculino', code: 'Sub-13 M', minAge: 12, maxAge: 13, gender: 'M', defaultGroup: 'pequenos', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' },
-  { id: 'sub13_f', name: 'Sub-13 Feminino', code: 'Sub-13 F', minAge: 12, maxAge: 13, gender: 'F', defaultGroup: 'pequenos', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)' },
-  { id: 'sub16_m', name: 'Sub-16 Masculino', code: 'Sub-16 M', minAge: 14, maxAge: 16, gender: 'M', defaultGroup: 'grandes', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)' },
-  { id: 'sub16_f', name: 'Sub-16 Feminino', code: 'Sub-16 F', minAge: 14, maxAge: 16, gender: 'F', defaultGroup: 'grandes', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)' },
-  { id: 'sub18_m', name: 'Sub-18 Masculino', code: 'Sub-18 M', minAge: 17, maxAge: 18, gender: 'M', defaultGroup: 'grandes', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)' },
-  { id: 'sub18_f', name: 'Sub-18 Feminino', code: 'Sub-18 F', minAge: 17, maxAge: 18, gender: 'F', defaultGroup: 'grandes', color: '#d946ef', bg: 'rgba(217, 70, 239, 0.15)' },
-];
-
-export function getCategoryById(id) {
-  return CATEGORIES.find(c => c.id === id) || {
-    id: 'unknown',
-    name: 'Geral',
-    code: 'Geral',
-    color: '#94a3b8',
-    bg: 'rgba(148, 163, 184, 0.15)'
-  };
-}
-
-export function calculateAge(birthDateString) {
-  if (!birthDateString) return null;
-  const birth = new Date(birthDateString);
-  const now = new Date();
-  let age = now.getFullYear() - birth.getFullYear();
-  const m = now.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
-    age--;
-  }
-  return age;
-}
-
-export function suggestCategory(birthDateString, gender = 'M') {
-  const age = calculateAge(birthDateString);
-  if (age === null) return 'sub13_m';
-
-  if (age <= 11) return gender === 'F' ? 'sub11_f' : 'sub11_m';
-  if (age <= 13) return gender === 'F' ? 'sub13_f' : 'sub13_m';
-  if (age <= 16) return gender === 'F' ? 'sub16_f' : 'sub16_m';
-  return gender === 'F' ? 'sub18_f' : 'sub18_m';
-}
-
-const STORAGE_KEY_ATHLETES = 'voa_athletes_v2';
-const STORAGE_KEY_TRAININGS = 'voa_trainings_v2';
-const STORAGE_KEY_PAYMENTS = 'voa_payments_v2';
-const STORAGE_KEY_CONFIG = 'voa_config_v2';
-
-// Dados Iniciais Realistas com 2 Turmas e Atletas de Exceção que jogam no Grande
-export const INITIAL_ATHLETES = [
-  // TURMA PEQUENOS (6 a 14 anos)
+    id: 'at_2',
+    name: 'Beatriz Lima',
+    birthDate: '2012-08-20',
+    gender: 'F',
+    category: 'sub15',
+    categories: ['sub15', 'sub17'],
+    position: 'Ponteira',
+    phone: '11976543210',
+    monthlyFee: 150,
+    active: true,
+    createdAt: '2026-01-15',
+    evaluation: {
+      saque: 8.5,
+      toque: 7.0,
+      manchete: 8.5,
+      precisaoAtaque: 9.0,
+      acertoAtaque: 8.5,
+      posicionamento: 8.0,
+      volumeJogo: 8.5,
+      notes: 'Ataque potente na paralela e saque flutuante agressivo.',
+      updatedAt: '2026-10-12'
+    },
+    evaluationHistory: [
+      {
+        id: 'eval_bia_1',
+        date: '2026-08-20',
+        average: 7.4,
+        notes: 'Boa força física, desenvolvendo precisão.',
+        skills: { saque: 7.5, toque: 6.5, manchete: 7.5, precisaoAtaque: 8.0, acertoAtaque: 7.5, posicionamento: 7.0, volumeJogo: 7.5 }
+      },
+      {
+        id: 'eval_bia_2',
+        date: '2026-10-12',
+        average: 8.3,
+        notes: 'Ataque potente na paralela e saque flutuante agressivo.',
+        skills: { saque: 8.5, toque: 7.0, manchete: 8.5, precisaoAtaque: 9.0, acertoAtaque: 8.5, posicionamento: 8.0, volumeJogo: 8.5 }
+      }
+    ]
+  },
   {
-    id: 'ath-1',
-    name: 'Lucas Gabriel Silveira',
-    nickname: 'Luquinhas',
-    birthDate: '2015-04-12',
+    id: 'at_3',
+    name: 'Lucas Martins',
+    birthDate: '2010-02-14',
     gender: 'M',
-    groupId: 'pequenos',
-    playsUp: false,
-    categoryId: 'sub11_m',
-    guardianName: 'Marcos Silveira (Pai)',
-    guardianPhone: '11987654321',
-    athletePhone: '',
+    category: 'sub17',
+    categories: ['sub17', 'sub19'],
+    position: 'Central',
+    phone: '11965432109',
+    monthlyFee: 150,
+    active: true,
+    createdAt: '2026-02-01',
+    evaluation: {
+      saque: 7.5,
+      toque: 6.5,
+      manchete: 7.0,
+      precisaoAtaque: 8.5,
+      acertoAtaque: 9.0,
+      posicionamento: 8.5,
+      volumeJogo: 8.0,
+      notes: 'Tempo de bloqueio excelente e ataque rápido pelo meio.',
+      updatedAt: '2026-10-08'
+    },
+    evaluationHistory: [
+      {
+        id: 'eval_lucas_1',
+        date: '2026-09-01',
+        average: 7.3,
+        notes: 'Ajuste de alcance e salto vertical.',
+        skills: { saque: 7.0, toque: 6.0, manchete: 6.5, precisaoAtaque: 8.0, acertoAtaque: 8.5, posicionamento: 7.5, volumeJogo: 7.5 }
+      },
+      {
+        id: 'eval_lucas_2',
+        date: '2026-10-08',
+        average: 7.9,
+        notes: 'Tempo de bloqueio excelente e ataque rápido pelo meio.',
+        skills: { saque: 7.5, toque: 6.5, manchete: 7.0, precisaoAtaque: 8.5, acertoAtaque: 9.0, posicionamento: 8.5, volumeJogo: 8.0 }
+      }
+    ]
+  },
+  {
+    id: 'at_4',
+    name: 'Ana Carolina Silva',
+    birthDate: '2015-06-18',
+    gender: 'F',
+    category: 'sub11',
+    categories: ['sub11', 'sub13'], // 11 anos jogando Sub-11 e Sub-13
+    position: 'Iniciante / Geral',
+    phone: '11954321098',
     monthlyFee: 130,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Meio-campo / Armador',
-    medicalNotes: 'Nenhuma restrição',
+    active: true,
     createdAt: '2026-02-10'
   },
   {
-    id: 'ath-2',
-    name: 'Enzo Rodrigues Alves',
-    nickname: 'Enzo',
-    birthDate: '2016-08-22',
+    id: 'at_5',
+    name: 'Matheus Henrique',
+    birthDate: '2013-11-05',
     gender: 'M',
-    groupId: 'pequenos',
-    playsUp: false,
-    categoryId: 'sub11_m',
-    guardianName: 'Fernanda Alves (Mãe)',
-    guardianPhone: '11981112233',
-    athletePhone: '',
-    monthlyFee: 130,
-    dueDay: 5,
-    status: 'ativo',
-    position: 'Atacante',
-    medicalNotes: 'Usa bombinha para asma preventiva',
-    createdAt: '2026-03-01'
-  },
-  {
-    id: 'ath-3',
-    name: 'Sofia Helena Martins',
-    nickname: 'Sofi',
-    birthDate: '2015-11-05',
-    gender: 'F',
-    groupId: 'pequenos',
-    playsUp: false,
-    categoryId: 'sub11_f',
-    guardianName: 'Camila Martins (Mãe)',
-    guardianPhone: '11972345678',
-    athletePhone: '',
-    monthlyFee: 130,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Ala Esquerda',
-    medicalNotes: 'Alérgica a frutos do mar',
-    createdAt: '2026-02-15'
-  },
-  {
-    id: 'ath-4',
-    name: 'Lara Beatriz Santos',
-    nickname: 'Larinha',
-    birthDate: '2016-01-30',
-    gender: 'F',
-    groupId: 'pequenos',
-    playsUp: false,
-    categoryId: 'sub11_f',
-    guardianName: 'Renato Santos (Pai)',
-    guardianPhone: '11993456789',
-    athletePhone: '',
-    monthlyFee: 130,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Goleira',
-    medicalNotes: '',
-    createdAt: '2026-03-12'
-  },
-  // SUB-13 COM ATLETAS DE EXCEÇÃO QUE JOGAM NO GRANDE!
-  {
-    id: 'ath-5',
-    name: 'Matheus Felipe Costa',
-    nickname: 'Theus',
-    birthDate: '2013-05-18', // 13 anos
-    gender: 'M',
-    groupId: 'pequenos',
-    playsUp: true, // EXCEÇÃO: Joga no Grande!
-    categoryId: 'sub13_m',
-    guardianName: 'Juliana Costa (Mãe)',
-    guardianPhone: '11974561234',
-    athletePhone: '11974561235',
+    category: 'sub13',
+    categories: ['sub13', 'sub15'],
+    position: 'Oposto',
+    phone: '11943210987',
     monthlyFee: 140,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Zagueiro Central / Armador',
-    medicalNotes: 'Destaque técnico - joga também na Turma dos Grandes',
-    createdAt: '2026-01-15'
+    active: true,
+    createdAt: '2026-02-20'
   },
   {
-    id: 'ath-6',
-    name: 'Davi Lucca Ribeiro',
-    nickname: 'Davi',
-    birthDate: '2014-02-14', // 12 anos
+    id: 'at_6',
+    name: 'Larissa Rocha',
+    birthDate: '2010-09-30',
+    gender: 'F',
+    category: 'sub17',
+    categories: ['sub17'],
+    position: 'Líbero',
+    phone: '11932109876',
+    monthlyFee: 150,
+    active: true,
+    createdAt: '2026-03-01',
+    evaluation: {
+      saque: 6.5,
+      toque: 8.5,
+      manchete: 9.5,
+      precisaoAtaque: 5.5,
+      acertoAtaque: 5.0,
+      posicionamento: 9.5,
+      volumeJogo: 10.0,
+      notes: 'Destaque absoluto em recepção, cobertura de ataque e defesa.',
+      updatedAt: '2026-10-15'
+    }
+  },
+  {
+    id: 'at_7',
+    name: 'Enzo Ferrari',
+    birthDate: '2016-03-25',
     gender: 'M',
-    groupId: 'pequenos',
-    playsUp: false,
-    categoryId: 'sub13_m',
-    guardianName: 'Paulo Ribeiro (Pai)',
-    guardianPhone: '11985672345',
-    athletePhone: '',
+    category: 'sub11',
+    categories: ['sub11', 'sub13', 'sub15'], // 10 anos jogando Sub-11, Sub-13 e Sub-15!
+    position: 'Iniciante / Geral',
+    phone: '11921098765',
+    monthlyFee: 130,
+    active: true,
+    createdAt: '2026-03-10'
+  },
+  {
+    id: 'at_8',
+    name: 'Sophia Ferreira',
+    birthDate: '2014-01-19',
+    gender: 'F',
+    category: 'sub13',
+    categories: ['sub13', 'sub15'],
+    position: 'Levantadora',
+    phone: '11910987654',
     monthlyFee: 140,
-    dueDay: 5,
-    status: 'ativo',
-    position: 'Volante',
-    medicalNotes: '',
-    createdAt: '2026-02-01'
+    active: true,
+    createdAt: '2026-03-15'
   },
   {
-    id: 'ath-7',
-    name: 'Isabella Moreira Lima',
-    nickname: 'Bella',
-    birthDate: '2013-09-09', // 13 anos
-    gender: 'F',
-    groupId: 'pequenos',
-    playsUp: true, // EXCEÇÃO: Joga no Grande!
-    categoryId: 'sub13_f',
-    guardianName: 'Patricia Moreira (Mãe)',
-    guardianPhone: '11988776655',
-    athletePhone: '11988776656',
-    monthlyFee: 140,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Meia Ofensiva',
-    medicalNotes: 'Alto rendimento - convocada para treinos dos Grandes',
-    createdAt: '2026-01-20'
-  },
-  {
-    id: 'ath-8',
-    name: 'Manuela Nogueira Cruz',
-    nickname: 'Manu',
-    birthDate: '2014-07-25', // 12 anos
-    gender: 'F',
-    groupId: 'pequenos',
-    playsUp: false,
-    categoryId: 'sub13_f',
-    guardianName: 'Eduardo Cruz (Pai)',
-    guardianPhone: '11991234567',
-    athletePhone: '',
-    monthlyFee: 0,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Pivô / Centroavante',
-    medicalNotes: 'Atleta Bolsista de Formação',
-    createdAt: '2026-02-05'
-  },
-  // TURMA GRANDES (14 anos acima)
-  {
-    id: 'ath-9',
-    name: 'Gabriel Henrique Duarte',
-    nickname: 'Biel',
-    birthDate: '2010-03-14', // 16 anos
+    id: 'at_9',
+    name: 'Felipe Nascimento',
+    birthDate: '2008-07-08',
     gender: 'M',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub16_m',
-    guardianName: 'Marcelo Duarte (Pai)',
-    guardianPhone: '11976549876',
-    athletePhone: '11976549877',
-    monthlyFee: 150,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Extremo Direito',
-    medicalNotes: '',
-    createdAt: '2025-10-10'
-  },
-  {
-    id: 'ath-10',
-    name: 'Pedro Arthur Mendes',
-    nickname: 'Pedrão',
-    birthDate: '2011-06-30', // 15 anos
-    gender: 'M',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub16_m',
-    guardianName: 'Aline Mendes (Mãe)',
-    guardianPhone: '11984321098',
-    athletePhone: '11984321099',
-    monthlyFee: 150,
-    dueDay: 5,
-    status: 'ativo',
-    position: 'Goleiro Titular',
-    medicalNotes: '',
-    createdAt: '2025-11-02'
-  },
-  {
-    id: 'ath-11',
-    name: 'Julia Cristina Barbosa',
-    nickname: 'Juju',
-    birthDate: '2010-12-19', // 15 anos
-    gender: 'F',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub16_f',
-    guardianName: 'Cristiane Barbosa (Mãe)',
-    guardianPhone: '11998761234',
-    athletePhone: '11998761235',
-    monthlyFee: 150,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Armadora Central',
-    medicalNotes: '',
-    createdAt: '2025-09-18'
-  },
-  {
-    id: 'ath-12',
-    name: 'Beatriz Vasconcelos',
-    nickname: 'Bia',
-    birthDate: '2011-04-08', // 15 anos
-    gender: 'F',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub16_f',
-    guardianName: 'Jorge Vasconcelos (Pai)',
-    guardianPhone: '11973216549',
-    athletePhone: '',
-    monthlyFee: 150,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Lateral Defensiva',
-    medicalNotes: 'Recuperada de entorse no tornozelo',
-    createdAt: '2025-10-25'
-  },
-  {
-    id: 'ath-13',
-    name: 'Felipe Augusto Toledo',
-    nickname: 'Toledo',
-    birthDate: '2008-07-11', // 18 anos
-    gender: 'M',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub18_m',
-    guardianName: 'Ricardo Toledo (Pai)',
-    guardianPhone: '11987654320',
-    athletePhone: '11987654322',
+    category: 'sub19',
+    categories: ['sub19', 'adulto'],
+    position: 'Ponteiro',
+    phone: '11909876543',
     monthlyFee: 160,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Capitão / Meio-Campo',
-    medicalNotes: '',
-    createdAt: '2025-05-10'
+    active: true,
+    createdAt: '2026-03-20',
+    evaluation: {
+      saque: 9.0,
+      toque: 7.5,
+      manchete: 8.0,
+      precisaoAtaque: 8.5,
+      acertoAtaque: 9.0,
+      posicionamento: 8.5,
+      volumeJogo: 8.5,
+      notes: 'Poder de ataque no fundo de quadra (pipe) e saque viagem veloz.',
+      updatedAt: '2026-10-14'
+    }
   },
   {
-    id: 'ath-14',
-    name: 'Nicolas Santana Prado',
-    nickname: 'Nico',
-    birthDate: '2009-01-20', // 17 anos
-    gender: 'M',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub18_m',
-    guardianName: 'Silvia Santana (Mãe)',
-    guardianPhone: '11981239876',
-    athletePhone: '11981239877',
-    monthlyFee: 160,
-    dueDay: 5,
-    status: 'ativo',
-    position: 'Centroavante',
-    medicalNotes: '',
-    createdAt: '2025-06-15'
-  },
-  {
-    id: 'ath-15',
-    name: 'Camila Vitória Ferreira',
-    nickname: 'Mila',
-    birthDate: '2008-10-04', // 18 anos
+    id: 'at_10',
+    name: 'Camila Duarte',
+    birthDate: '2008-12-11',
     gender: 'F',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub18_f',
-    guardianName: 'Valéria Ferreira (Mãe)',
-    guardianPhone: '11996541230',
-    athletePhone: '11996541231',
+    category: 'sub19',
+    categories: ['sub19', 'adulto'],
+    position: 'Central',
+    phone: '11998761234',
     monthlyFee: 160,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Extrema / Ponta',
-    medicalNotes: '',
-    createdAt: '2025-07-01'
-  },
-  {
-    id: 'ath-16',
-    name: 'Giovanna Rocha Dias',
-    nickname: 'Gio',
-    birthDate: '2009-05-15', // 17 anos
-    gender: 'F',
-    groupId: 'grandes',
-    playsUp: false,
-    categoryId: 'sub18_f',
-    guardianName: 'Marcos Dias (Pai)',
-    guardianPhone: '11983457890',
-    athletePhone: '11983457891',
-    monthlyFee: 160,
-    dueDay: 10,
-    status: 'ativo',
-    position: 'Goleira',
-    medicalNotes: '',
-    createdAt: '2025-08-12'
+    active: true,
+    createdAt: '2026-04-01'
   }
 ];
 
-// Treinos seguindo a grade oficial:
-// PEQUENOS: Terça, Quinta e Sábado
-// GRANDES: Segunda, Quinta e Sábado
-export const INITIAL_TRAININGS = [
-  // Quinta-feira (Hoje - 15/10/2026): Treino dos Pequenos e dos Grandes!
-  {
-    id: 'tr-1',
-    groupId: 'pequenos',
-    categoryId: 'all',
-    date: '2026-10-15', // Quinta-feira
-    dayName: 'Quinta-feira',
-    startTime: '15:30',
-    endTime: '17:00',
-    location: 'Quadra Principal VOA',
-    coach: 'Prof. Carlos Eduardo',
-    focus: 'Fundamentos de Passe, Domínio e Condução Rápida',
-    attendance: [
-      { athleteId: 'ath-1', status: 'presente', note: '' },
-      { athleteId: 'ath-2', status: 'presente', note: '' },
-      { athleteId: 'ath-3', status: 'presente', note: '' },
-      { athleteId: 'ath-4', status: 'presente', note: '' },
-      { athleteId: 'ath-5', status: 'presente', note: 'Treina no Pequeno e no Grande' },
-      { athleteId: 'ath-6', status: 'presente', note: '' },
-      { athleteId: 'ath-7', status: 'presente', note: '' },
-      { athleteId: 'ath-8', status: 'presente', note: '' }
-    ],
-    status: 'concluido'
-  },
-  {
-    id: 'tr-2',
-    groupId: 'grandes',
-    categoryId: 'all',
-    date: '2026-10-15', // Quinta-feira
-    dayName: 'Quinta-feira',
-    startTime: '17:15',
-    endTime: '19:00',
-    location: 'Quadra Principal VOA',
-    coach: 'Profa. Juliana Rossi e Prof. Roberto',
-    focus: 'Tática Coletiva, Transição Ofensiva e Finalizações',
-    attendance: [
-      { athleteId: 'ath-9', status: 'presente', note: '' },
-      { athleteId: 'ath-10', status: 'presente', note: '' },
-      { athleteId: 'ath-11', status: 'presente', note: '' },
-      { athleteId: 'ath-12', status: 'ausente', note: 'Avisou compromisso escolar' },
-      { athleteId: 'ath-13', status: 'presente', note: '' },
-      { athleteId: 'ath-14', status: 'presente', note: '' },
-      { athleteId: 'ath-15', status: 'presente', note: '' },
-      { athleteId: 'ath-16', status: 'presente', note: '' },
-      // Exceções presentes no treino dos Grandes:
-      { athleteId: 'ath-5', status: 'presente', note: 'Atleta do Pequeno jogando no Grande' },
-      { athleteId: 'ath-7', status: 'presente', note: 'Atleta do Pequeno jogando no Grande' }
-    ],
-    status: 'concluido'
-  },
-  // Sábado (17/10/2026): Pequenos pela manhã + Grandes na sequência
-  {
-    id: 'tr-3',
-    groupId: 'pequenos',
-    categoryId: 'all',
-    date: '2026-10-17', // Sábado
-    dayName: 'Sábado',
-    startTime: '08:30',
-    endTime: '10:00',
-    location: 'Quadra Principal VOA',
-    coach: 'Prof. Carlos Eduardo',
-    focus: 'Jogos Coletivos Reduzidos e Finalização',
-    attendance: [],
-    status: 'agendado'
-  },
-  {
-    id: 'tr-4',
-    groupId: 'grandes',
-    categoryId: 'all',
-    date: '2026-10-17', // Sábado
-    dayName: 'Sábado',
-    startTime: '10:15',
-    endTime: '12:00',
-    location: 'Quadra Principal VOA',
-    coach: 'Profa. Juliana Rossi',
-    focus: 'Simulação de Partida Oficial e Bola Parada',
-    attendance: [],
-    status: 'agendado'
-  },
-  // Segunda-feira (19/10/2026): Treino Exclusivo dos GRANDES
-  {
-    id: 'tr-5',
-    groupId: 'grandes',
-    categoryId: 'all',
-    date: '2026-10-19', // Segunda-feira
-    dayName: 'Segunda-feira',
-    startTime: '17:30',
-    endTime: '19:15',
-    location: 'Quadra Principal VOA',
-    coach: 'Prof. Roberto Martins',
-    focus: 'Condicionamento Físico, Força e Organização Tática',
-    attendance: [],
-    status: 'agendado'
-  },
-  // Terça-feira (20/10/2026): Treino Exclusivo dos PEQUENOS
-  {
-    id: 'tr-6',
-    groupId: 'pequenos',
-    categoryId: 'all',
-    date: '2026-10-20', // Terça-feira
-    dayName: 'Terça-feira',
-    startTime: '16:00',
-    endTime: '17:30',
-    location: 'Quadra Principal VOA',
-    coach: 'Prof. Carlos Eduardo',
-    focus: 'Coordenação Motora, Drible e Tomada de Decisão',
-    attendance: [],
-    status: 'agendado'
-  }
-];
-
-export const INITIAL_PAYMENTS = [
-  // Mês de Outubro de 2026 (2026-10)
-  {
-    id: 'pay-1',
-    athleteId: 'ath-1',
-    monthRef: '2026-10',
-    amount: 130,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-09',
-    paymentMethod: 'Pix',
-    receiptCode: 'VOA-202610-001',
-    notes: 'Pago adiantado via Pix'
-  },
-  {
-    id: 'pay-2',
-    athleteId: 'ath-2',
-    monthRef: '2026-10',
-    amount: 130,
-    dueDate: '2026-10-05',
-    status: 'pago',
-    paidDate: '2026-10-05',
-    paymentMethod: 'Cartão de Débito',
-    receiptCode: 'VOA-202610-002',
-    notes: 'Pago na recepção'
-  },
-  {
-    id: 'pay-3',
-    athleteId: 'ath-3',
-    monthRef: '2026-10',
-    amount: 130,
-    dueDate: '2026-10-10',
-    status: 'atrasado',
-    paidDate: null,
-    paymentMethod: null,
-    receiptCode: null,
-    notes: 'Vencido há 5 dias - Enviar lembrete'
-  },
-  {
-    id: 'pay-4',
-    athleteId: 'ath-4',
-    monthRef: '2026-10',
-    amount: 130,
-    dueDate: '2026-10-10',
-    status: 'atrasado',
-    paidDate: null,
-    paymentMethod: null,
-    receiptCode: null,
-    notes: ''
-  },
-  {
-    id: 'pay-5',
-    athleteId: 'ath-5',
-    monthRef: '2026-10',
-    amount: 140,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-10',
-    paymentMethod: 'Pix',
-    receiptCode: 'VOA-202610-005',
-    notes: ''
-  },
-  {
-    id: 'pay-6',
-    athleteId: 'ath-6',
-    monthRef: '2026-10',
-    amount: 140,
-    dueDate: '2026-10-05',
-    status: 'pago',
-    paidDate: '2026-10-04',
-    paymentMethod: 'Dinheiro',
-    receiptCode: 'VOA-202610-006',
-    notes: ''
-  },
-  {
-    id: 'pay-7',
-    athleteId: 'ath-7',
-    monthRef: '2026-10',
-    amount: 140,
-    dueDate: '2026-10-10',
-    status: 'atrasado',
-    paidDate: null,
-    paymentMethod: null,
-    receiptCode: null,
-    notes: ''
-  },
-  {
-    id: 'pay-8',
-    athleteId: 'ath-8',
-    monthRef: '2026-10',
-    amount: 0,
-    dueDate: '2026-10-10',
-    status: 'isento',
-    paidDate: '2026-10-01',
-    paymentMethod: 'Bolsa',
-    receiptCode: 'VOA-BOLSA-008',
-    notes: 'Atleta Bolsista Integral'
-  },
-  {
-    id: 'pay-9',
-    athleteId: 'ath-9',
-    monthRef: '2026-10',
-    amount: 150,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-08',
-    paymentMethod: 'Pix',
-    receiptCode: 'VOA-202610-009',
-    notes: ''
-  },
-  {
-    id: 'pay-10',
-    athleteId: 'ath-10',
-    monthRef: '2026-10',
-    amount: 150,
-    dueDate: '2026-10-05',
-    status: 'atrasado',
-    paidDate: null,
-    paymentMethod: null,
-    receiptCode: null,
-    notes: ''
-  },
-  {
-    id: 'pay-11',
-    athleteId: 'ath-11',
-    monthRef: '2026-10',
-    amount: 150,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-10',
-    paymentMethod: 'Cartão de Crédito',
-    receiptCode: 'VOA-202610-011',
-    notes: ''
-  },
-  {
-    id: 'pay-12',
-    athleteId: 'ath-12',
-    monthRef: '2026-10',
-    amount: 150,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-09',
-    paymentMethod: 'Pix',
-    receiptCode: 'VOA-202610-012',
-    notes: ''
-  },
-  {
-    id: 'pay-13',
-    athleteId: 'ath-13',
-    monthRef: '2026-10',
-    amount: 160,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-07',
-    paymentMethod: 'Pix',
-    receiptCode: 'VOA-202610-013',
-    notes: ''
-  },
-  {
-    id: 'pay-14',
-    athleteId: 'ath-14',
-    monthRef: '2026-10',
-    amount: 160,
-    dueDate: '2026-10-05',
-    status: 'atrasado',
-    paidDate: null,
-    paymentMethod: null,
-    receiptCode: null,
-    notes: 'Pai informou que pagará no dia 20'
-  },
-  {
-    id: 'pay-15',
-    athleteId: 'ath-15',
-    monthRef: '2026-10',
-    amount: 160,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-10',
-    paymentMethod: 'Pix',
-    receiptCode: 'VOA-202610-015',
-    notes: ''
-  },
-  {
-    id: 'pay-16',
-    athleteId: 'ath-16',
-    monthRef: '2026-10',
-    amount: 160,
-    dueDate: '2026-10-10',
-    status: 'pago',
-    paidDate: '2026-10-10',
-    paymentMethod: 'Transferência Bancária',
-    receiptCode: 'VOA-202610-016',
-    notes: ''
-  }
-];
-
-export const INITIAL_CONFIG = {
-  academyName: 'VOA Sports Academy',
-  cnpj: '38.452.891/0001-44',
-  pixKey: 'pix@voasports.com.br',
-  pixType: 'Email',
-  phone: '(11) 98765-4321',
-  address: 'Av. dos Esportes, 1200 - São Paulo, SP',
-  defaultFee: 140,
-  defaultDueDay: 10,
-  theme: 'dark'
+const INITIAL_PROFILE = {
+  name: 'Vitor Gabriel',
+  role: 'Treinador Principal',
+  email: 'voleiacademyolympic@gmail.com',
+  academy: 'VOA Academy',
+  phone: '77981419995',
+  bio: 'Treinador de voleibol dedicado à formação de atletas e alto rendimento.'
 };
 
-// Data Store Class
-class DataStore {
-  constructor() {
-    this.athletes = this.load(STORAGE_KEY_ATHLETES, INITIAL_ATHLETES);
-    this.trainings = this.load(STORAGE_KEY_TRAININGS, INITIAL_TRAININGS);
-    this.payments = this.load(STORAGE_KEY_PAYMENTS, INITIAL_PAYMENTS);
-    this.config = this.load(STORAGE_KEY_CONFIG, INITIAL_CONFIG);
-  }
-
-  load(key, fallback) {
-    try {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : fallback;
-    } catch (e) {
-      console.warn(`Erro ao carregar do localStorage (${key}):`, e);
-      return fallback;
-    }
-  }
-
-  saveAthletes() {
-    localStorage.setItem(STORAGE_KEY_ATHLETES, JSON.stringify(this.athletes));
-  }
-
-  saveTrainings() {
-    localStorage.setItem(STORAGE_KEY_TRAININGS, JSON.stringify(this.trainings));
-  }
-
-  savePayments() {
-    localStorage.setItem(STORAGE_KEY_PAYMENTS, JSON.stringify(this.payments));
-  }
-
-  saveConfig() {
-    localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(this.config));
-  }
-
-  resetAllData() {
-    this.athletes = JSON.parse(JSON.stringify(INITIAL_ATHLETES));
-    this.trainings = JSON.parse(JSON.stringify(INITIAL_TRAININGS));
-    this.payments = JSON.parse(JSON.stringify(INITIAL_PAYMENTS));
-    this.config = JSON.parse(JSON.stringify(INITIAL_CONFIG));
-    this.saveAthletes();
-    this.saveTrainings();
-    this.savePayments();
-    this.saveConfig();
-  }
-
-  // Athletes methods
-  getAthletes() {
-    return this.athletes;
-  }
-
-  getAthleteById(id) {
-    return this.athletes.find(a => a.id === id);
-  }
-
-  addAthlete(athleteData) {
-    const id = 'ath-' + Date.now();
-    const newAthlete = {
-      ...athleteData,
-      id,
-      groupId: athleteData.groupId || suggestGroup(athleteData.birthDate),
-      playsUp: Boolean(athleteData.playsUp),
-      createdAt: new Date().toISOString().split('T')[0]
-    };
-    this.athletes.unshift(newAthlete);
-    this.saveAthletes();
-
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    this.ensurePaymentRecord(newAthlete, currentMonth);
-
-    return newAthlete;
-  }
-
-  updateAthlete(id, athleteData) {
-    const index = this.athletes.findIndex(a => a.id === id);
-    if (index !== -1) {
-      this.athletes[index] = { 
-        ...this.athletes[index], 
-        ...athleteData,
-        playsUp: Boolean(athleteData.playsUp)
-      };
-      this.saveAthletes();
-      return this.athletes[index];
-    }
-    return null;
-  }
-
-  deleteAthlete(id) {
-    this.athletes = this.athletes.filter(a => a.id !== id);
-    this.saveAthletes();
-  }
-
-  // Trainings methods
-  getTrainings() {
-    return this.trainings.sort((a, b) => (b.date + ' ' + b.startTime).localeCompare(a.date + ' ' + a.startTime));
-  }
-
-  getTrainingById(id) {
-    return this.trainings.find(t => t.id === id);
-  }
-
-  // Retorna os atletas que devem participar de um treino
-  // Para treino dos GRANDES: inclui os atletas fixos dos Grandes + atletas dos Pequenos com exceção playsUp!
-  // Para treino dos PEQUENOS: inclui os atletas da turma dos Pequenos
-  getAthletesForTraining(training) {
-    const groupId = training.groupId || (training.categoryId && training.categoryId.includes('16') || training.categoryId.includes('18') ? 'grandes' : 'pequenos');
-    
-    if (groupId === 'grandes') {
-      return this.athletes.filter(a => a.status === 'ativo' && (a.groupId === 'grandes' || a.playsUp === true));
-    } else {
-      return this.athletes.filter(a => a.status === 'ativo' && a.groupId === 'pequenos');
-    }
-  }
-
-  addTraining(trainingData) {
-    const id = 'tr-' + Date.now();
-    const newTraining = {
-      ...trainingData,
-      id,
-      groupId: trainingData.groupId || 'pequenos',
-      attendance: trainingData.attendance || [],
-      status: trainingData.status || 'agendado'
-    };
-    this.trainings.unshift(newTraining);
-    this.saveTrainings();
-    return newTraining;
-  }
-
-  updateTraining(id, trainingData) {
-    const index = this.trainings.findIndex(t => t.id === id);
-    if (index !== -1) {
-      this.trainings[index] = { ...this.trainings[index], ...trainingData };
-      this.saveTrainings();
-      return this.trainings[index];
-    }
-    return null;
-  }
-
-  deleteTraining(id) {
-    this.trainings = this.trainings.filter(t => t.id !== id);
-    this.saveTrainings();
-  }
-
-  saveAttendance(trainingId, attendanceArray) {
-    const training = this.getTrainingById(trainingId);
-    if (training) {
-      training.attendance = attendanceArray;
-      training.status = 'concluido';
-      this.saveTrainings();
-      return training;
-    }
-    return null;
-  }
-
-  // Payments methods
-  getPayments(monthRef = null) {
-    let list = this.payments;
-    if (monthRef) {
-      list = list.filter(p => p.monthRef === monthRef);
-    }
-    const today = new Date().toISOString().split('T')[0];
-    list.forEach(p => {
-      if (p.status !== 'pago' && p.status !== 'isento') {
-        if (p.dueDate && p.dueDate < today) {
-          p.status = 'atrasado';
-        } else {
-          p.status = 'pendente';
-        }
-      }
-    });
-    return list;
-  }
-
-  getPaymentById(id) {
-    return this.payments.find(p => p.id === id);
-  }
-
-  ensurePaymentRecord(athlete, monthRef) {
-    const existing = this.payments.find(p => p.athleteId === athlete.id && p.monthRef === monthRef);
-    if (!existing) {
-      const year = monthRef.split('-')[0];
-      const month = monthRef.split('-')[1];
-      const dueDay = String(athlete.dueDay || 10).padStart(2, '0');
-      const dueDate = `${year}-${month}-${dueDay}`;
-      const isFree = Number(athlete.monthlyFee) === 0;
-
-      const newPayment = {
-        id: 'pay-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-        athleteId: athlete.id,
-        monthRef,
-        amount: Number(athlete.monthlyFee) || 0,
-        dueDate,
-        status: isFree ? 'isento' : (new Date().toISOString().split('T')[0] > dueDate ? 'atrasado' : 'pendente'),
-        paidDate: isFree ? `${year}-${month}-01` : null,
-        paymentMethod: isFree ? 'Bolsa' : null,
-        receiptCode: isFree ? `VOA-BOLSA-${athlete.id.slice(-4)}` : null,
-        notes: isFree ? 'Bolsista' : ''
-      };
-      this.payments.push(newPayment);
-      this.savePayments();
-      return newPayment;
-    }
-    return existing;
-  }
-
-  syncPaymentsForMonth(monthRef) {
-    this.athletes.forEach(athlete => {
-      if (athlete.status === 'ativo') {
-        this.ensurePaymentRecord(athlete, monthRef);
-      }
-    });
-  }
-
-  recordPayment(paymentId, { paidDate, paymentMethod, notes, customAmount }) {
-    const payment = this.getPaymentById(paymentId);
-    if (payment) {
-      payment.status = 'pago';
-      payment.paidDate = paidDate || new Date().toISOString().split('T')[0];
-      payment.paymentMethod = paymentMethod || 'Pix';
-      payment.notes = notes || '';
-      if (customAmount !== undefined && customAmount !== null) {
-        payment.amount = Number(customAmount);
-      }
-      if (!payment.receiptCode) {
-        const rand = Math.floor(1000 + Math.random() * 9000);
-        payment.receiptCode = `VOA-${payment.monthRef.replace('-', '')}-${rand}`;
-      }
-      this.savePayments();
-      return payment;
-    }
-    return null;
-  }
-
-  cancelPayment(paymentId) {
-    const payment = this.getPaymentById(paymentId);
-    if (payment) {
-      const today = new Date().toISOString().split('T')[0];
-      payment.status = payment.dueDate < today ? 'atrasado' : 'pendente';
-      payment.paidDate = null;
-      payment.paymentMethod = null;
-      this.savePayments();
-      return payment;
-    }
-    return null;
-  }
-
-  // Backup and Export
-  exportAllDataJSON() {
-    return JSON.stringify({
-      version: '2.0',
-      exportedAt: new Date().toISOString(),
-      config: this.config,
-      groups: GROUPS,
-      athletes: this.athletes,
-      trainings: this.trainings,
-      payments: this.payments
-    }, null, 2);
-  }
-
-  importDataJSON(jsonString) {
-    try {
-      const data = JSON.parse(jsonString);
-      if (Array.isArray(data.athletes) && Array.isArray(data.trainings)) {
-        this.athletes = data.athletes;
-        this.trainings = data.trainings;
-        this.payments = data.payments || [];
-        if (data.config) this.config = { ...this.config, ...data.config };
-        this.saveAthletes();
-        this.saveTrainings();
-        this.savePayments();
-        this.saveConfig();
-        return true;
-      }
-    } catch (e) {
-      console.error('Falha ao importar JSON:', e);
-    }
-    return false;
-  }
+// Funções de Cálculo Auxiliares (Regra de Federação Esportiva por Ano de Nascimento)
+export function getBirthYear(birthDateStr) {
+  if (!birthDateStr) return new Date().getFullYear();
+  const parts = String(birthDateStr).split('-');
+  return parseInt(parts[0], 10) || new Date().getFullYear();
 }
 
-export const store = new DataStore();
+// Idade Esportiva Oficial: ano corrente - ano de nascimento (Padrão CBV / Federações)
+export function calculateSportAge(birthDateStr) {
+  if (!birthDateStr) return 0;
+  const birthYear = getBirthYear(birthDateStr);
+  const currentYear = new Date().getFullYear();
+  return Math.max(0, currentYear - birthYear);
+}
+
+// Idade em anos (usada para exibição e categoria)
+export function calculateAge(birthDateStr) {
+  return calculateSportAge(birthDateStr);
+}
+
+// Sugestão de categoria oficial baseada no Ano de Nascimento
+export function calculateCategory(birthDateStr) {
+  const sportAge = calculateSportAge(birthDateStr);
+  if (sportAge <= 11) return 'sub11';
+  if (sportAge <= 13) return 'sub13';
+  if (sportAge <= 15) return 'sub15';
+  if (sportAge <= 17) return 'sub17';
+  if (sportAge <= 19) return 'sub19';
+  return 'adulto';
+}
+
+export function getCategoryObj(categoryId) {
+  return CATEGORIES.find(c => c.id === categoryId) || CATEGORIES[2];
+}
+
+export function athleteCanPlayCategory(athlete, categoryId) {
+  if (!athlete) return false;
+  if (!categoryId || categoryId === 'all') return true;
+  const cats = athlete.categories && Array.isArray(athlete.categories) && athlete.categories.length > 0
+    ? athlete.categories
+    : [athlete.category];
+  return cats.includes(categoryId);
+}
+
+// Funções Auxiliares de Avaliação Técnica
+export function calculateOverallRating(evalObj) {
+  if (!evalObj) return null;
+  const skills = ['saque', 'toque', 'manchete', 'precisaoAtaque', 'acertoAtaque', 'posicionamento', 'volumeJogo'];
+  let sum = 0;
+  let count = 0;
+  for (const s of skills) {
+    if (typeof evalObj[s] === 'number') {
+      sum += evalObj[s];
+      count++;
+    }
+  }
+  return count > 0 ? Number((sum / count).toFixed(1)) : null;
+}
+
+export function getEvaluationLevel(score) {
+  if (score === null || score === undefined) return { label: 'Não avaliado', color: '#94a3b8' };
+  if (score >= 9.0) return { label: 'Elite / Destaque', color: '#f59e0b' };
+  if (score >= 7.5) return { label: 'Avançado', color: '#10b981' };
+  if (score >= 6.0) return { label: 'Bom Rendimento', color: '#3b82f6' };
+  if (score >= 4.5) return { label: 'Em Desenvolvimento', color: '#f97316' };
+  return { label: 'Iniciante / Básico', color: '#ef4444' };
+}
+
+// ==========================================================================
+// STORE PRINCIPAL
+// ==========================================================================
+export const store = {
+  // ATLETAS
+  getAthletes() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_ATHLETES);
+      let athletes = data ? JSON.parse(data) : null;
+      if (!athletes || !Array.isArray(athletes) || athletes.length === 0) {
+        this.saveAthletes(INITIAL_ATHLETES);
+        return [...INITIAL_ATHLETES];
+      }
+      // Garante que todo atleta possua o array categories e suporte a evaluation e evaluationHistory
+      athletes = athletes.map(a => {
+        if (!a.categories || !Array.isArray(a.categories) || a.categories.length === 0) {
+          a.categories = [a.category || 'sub15'];
+        }
+        if (a.evaluation === undefined) {
+          const init = INITIAL_ATHLETES.find(ia => ia.id === a.id);
+          a.evaluation = init && init.evaluation ? init.evaluation : null;
+        }
+        if (!a.evaluationHistory || !Array.isArray(a.evaluationHistory) || a.evaluationHistory.length === 0) {
+          const init = INITIAL_ATHLETES.find(ia => ia.id === a.id);
+          if (init && Array.isArray(init.evaluationHistory) && init.evaluationHistory.length > 0) {
+            a.evaluationHistory = [...init.evaluationHistory];
+          } else if (a.evaluation) {
+            a.evaluationHistory = [{
+              id: 'eval_init_' + a.id,
+              date: a.evaluation.updatedAt || '2026-10-18',
+              average: calculateOverallRating(a.evaluation),
+              notes: a.evaluation.notes || '',
+              skills: { ...a.evaluation }
+            }];
+          } else {
+            a.evaluationHistory = [];
+          }
+        }
+        return a;
+      });
+      return athletes;
+    } catch (e) {
+      console.error('Erro ao ler atletas do LocalStorage:', e);
+      return [...INITIAL_ATHLETES];
+    }
+  },
+
+  saveAthletes(athletes) {
+    try {
+      localStorage.setItem(STORAGE_KEY_ATHLETES, JSON.stringify(athletes));
+    } catch (e) {
+      console.error('Erro ao salvar atletas no LocalStorage:', e);
+    }
+  },
+
+  getAthleteById(id) {
+    return this.getAthletes().find(a => a.id === id) || null;
+  },
+
+  saveAthleteEvaluation(athleteId, evaluation) {
+    const athletes = this.getAthletes();
+    const athlete = athletes.find(a => a.id === athleteId);
+    if (athlete) {
+      athlete.evaluation = evaluation;
+      if (!Array.isArray(athlete.evaluationHistory)) {
+        athlete.evaluationHistory = [];
+      }
+
+      const evalDate = evaluation.updatedAt || new Date().toISOString().split('T')[0];
+      const avg = calculateOverallRating(evaluation);
+
+      const existingIdx = athlete.evaluationHistory.findIndex(h => h.date === evalDate);
+      const newEntry = {
+        id: 'eval_' + Date.now(),
+        date: evalDate,
+        average: avg,
+        notes: evaluation.notes || '',
+        skills: { ...evaluation }
+      };
+
+      if (existingIdx !== -1) {
+        athlete.evaluationHistory[existingIdx] = newEntry;
+      } else {
+        athlete.evaluationHistory.push(newEntry);
+      }
+
+      // Ordena cronologicamente por data
+      athlete.evaluationHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      this.saveAthletes(athletes);
+      return athlete;
+    }
+    return null;
+  },
+
+  addAthlete(athlete) {
+    const athletes = this.getAthletes();
+    const newAthlete = {
+      ...athlete,
+      id: 'at_' + Date.now(),
+      active: true,
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+    athletes.unshift(newAthlete);
+    this.saveAthletes(athletes);
+    return newAthlete;
+  },
+
+  updateAthlete(id, updatedFields) {
+    const athletes = this.getAthletes();
+    const index = athletes.findIndex(a => a.id === id);
+    if (index !== -1) {
+      athletes[index] = { ...athletes[index], ...updatedFields };
+      this.saveAthletes(athletes);
+      return athletes[index];
+    }
+    return null;
+  },
+
+  deleteAthlete(id) {
+    const athletes = this.getAthletes().filter(a => a.id !== id);
+    this.saveAthletes(athletes);
+  },
+
+  // CHAMADA / PRESENÇAS
+  // Estrutura: { [dateStr]: { [athleteId]: 'presente' | 'falta' } }
+  getAttendances() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_ATTENDANCE);
+      return data ? JSON.parse(data) : {};
+    } catch (e) {
+      console.error('Erro ao ler attendances:', e);
+      return {};
+    }
+  },
+
+  getAttendanceForDate(dateStr) {
+    const all = this.getAttendances();
+    return all[dateStr] || null;
+  },
+
+  saveAttendanceForDate(dateStr, recordsMap) {
+    const all = this.getAttendances();
+    all[dateStr] = {
+      records: recordsMap,
+      savedAt: new Date().toISOString()
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY_ATTENDANCE, JSON.stringify(all));
+      return true;
+    } catch (e) {
+      console.error('Erro ao salvar attendance:', e);
+      return false;
+    }
+  },
+
+  // FINANCEIRO / MENSALIDADES
+  // Estrutura: { [monthKey]: { [athleteId]: { paid: boolean, paidAt?: string, amount: number } } }
+  // Ex: monthKey = '2026-10'
+  getFinances() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_FINANCES);
+      if (!data) {
+        // Inicializa pagamentos para o mês corrente para teste
+        const defaultFin = this.generateInitialFinances();
+        this.saveFinances(defaultFin);
+        return defaultFin;
+      }
+      return JSON.parse(data);
+    } catch (e) {
+      console.error('Erro ao ler finances:', e);
+      return {};
+    }
+  },
+
+  saveFinances(finances) {
+    try {
+      localStorage.setItem(STORAGE_KEY_FINANCES, JSON.stringify(finances));
+    } catch (e) {
+      console.error('Erro ao salvar finances:', e);
+    }
+  },
+
+  generateInitialFinances() {
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const athletes = this.getAthletes();
+    const monthData = {};
+    athletes.forEach((ath, idx) => {
+      // 70% pagos, 30% pendentes para teste
+      const isPaid = idx % 3 !== 0;
+      monthData[ath.id] = {
+        paid: isPaid,
+        amount: ath.monthlyFee || 150,
+        paidAt: isPaid ? `${currentMonth}-05` : null
+      };
+    });
+    return { [currentMonth]: monthData };
+  },
+
+  getFinancesForMonth(monthKey) {
+    const finances = this.getFinances();
+    return finances[monthKey] || {};
+  },
+
+  togglePaymentStatus(monthKey, athleteId, amount) {
+    const finances = this.getFinances();
+    if (!finances[monthKey]) {
+      finances[monthKey] = {};
+    }
+    const current = finances[monthKey][athleteId];
+    const newStatus = !(current && current.paid);
+    finances[monthKey][athleteId] = {
+      paid: newStatus,
+      amount: amount || 150,
+      paidAt: newStatus ? new Date().toISOString().split('T')[0] : null
+    };
+    this.saveFinances(finances);
+    return newStatus;
+  },
+
+  // PERFIL DO TREINADOR
+  getProfile() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY_PROFILE);
+      let profile = data ? JSON.parse(data) : INITIAL_PROFILE;
+      let changed = false;
+      if (profile.email !== 'voleiacademyolympic@gmail.com' || profile.phone !== '77981419995') {
+        profile.email = 'voleiacademyolympic@gmail.com';
+        profile.phone = '77981419995';
+        changed = true;
+      }
+      if (profile.academy !== 'VOA Academy') {
+        profile.academy = 'VOA Academy';
+        changed = true;
+      }
+      if (changed) {
+        this.saveProfile(profile);
+      }
+      return profile;
+    } catch (e) {
+      return INITIAL_PROFILE;
+    }
+  },
+
+  saveProfile(profile) {
+    try {
+      localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(profile));
+    } catch (e) {
+      console.error('Erro ao salvar profile:', e);
+    }
+  },
+
+  // BACKUP E RESTAURAÇÃO
+  exportAllDataJSON() {
+    const exportObj = {
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+      athletes: this.getAthletes(),
+      attendances: this.getAttendances(),
+      finances: this.getFinances(),
+      profile: this.getProfile()
+    };
+    return JSON.stringify(exportObj, null, 2);
+  },
+
+  importAllDataJSON(jsonStr) {
+    try {
+      const data = JSON.parse(jsonStr);
+      if (data.athletes && Array.isArray(data.athletes)) {
+        this.saveAthletes(data.athletes);
+      }
+      if (data.attendances) {
+        localStorage.setItem(STORAGE_KEY_ATTENDANCE, JSON.stringify(data.attendances));
+      }
+      if (data.finances) {
+        this.saveFinances(data.finances);
+      }
+      if (data.profile) {
+        this.saveProfile(data.profile);
+      }
+      return true;
+    } catch (e) {
+      console.error('Erro ao importar JSON:', e);
+      return false;
+    }
+  },
+
+  resetAllData() {
+    localStorage.removeItem(STORAGE_KEY_ATHLETES);
+    localStorage.removeItem(STORAGE_KEY_ATTENDANCE);
+    localStorage.removeItem(STORAGE_KEY_FINANCES);
+    localStorage.removeItem(STORAGE_KEY_PROFILE);
+    this.saveAthletes(INITIAL_ATHLETES);
+    this.saveFinances(this.generateInitialFinances());
+    this.saveProfile(INITIAL_PROFILE);
+  }
+};

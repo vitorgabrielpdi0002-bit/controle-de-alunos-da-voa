@@ -1,6 +1,6 @@
-# 🦅 VOA Sports - Sistema de Gestão de Atletas, Frequência e Mensalidades
+# 🦅 VOA Academy - Sistema de Gestão de Atletas, Frequência e Mensalidades
 
-Sistema completo, moderno e intuitivo desenvolvido para a **VOA Sports**, oferecendo controle total de atletas das categorias de base e rendimento, agenda e chamadas de treino em tempo real, além de gestão financeira com baixa de mensalidades, recibos oficiais e integração com WhatsApp.
+Sistema completo, moderno e intuitivo desenvolvido para a **VOA Academy**, oferecendo controle total de atletas das categorias de base e rendimento, agenda e chamadas de treino em tempo real, além de gestão financeira com baixa de mensalidades, recibos oficiais e integração com WhatsApp.
 
 ---
 
@@ -53,7 +53,7 @@ Para efeitos de federação, torneios e fichas cadastrais, os atletas continuam 
   - Taxa de Adimplência (%)
 - **Ações Rápidas:**
   - **Dar Baixa / Registrar Pagamento:** Registra o valor, método de pagamento e gera código de recibo.
-  - **Emitir Recibo Oficial:** Recibo pronto com logotipo da VOA Sports, CNPJ, dados do atleta, valor e assinatura (formatado para impressão ou salvar em PDF).
+  - **Emitir Recibo Oficial:** Recibo pronto com logotipo da VOA Academy, CNPJ, dados do atleta, valor e assinatura (formatado para impressão ou salvar em PDF).
   - **Lembrar no WhatsApp:** Mensagem pré-formatada cordial informando o valor, data de vencimento e chave Pix para os pais.
 
 ---
